@@ -6,7 +6,25 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <PackageProjectUrl>https://github.com/WTFBlaze/Streamerfy</PackageProjectUrl>
+    <Copyright>WTFBlaze</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>False</IncludeSymbols>
+    <SignAssembly>False</SignAssembly>
+    <PackageIcon>Streamerfy_Logo.png</PackageIcon>
+    <ApplicationIcon>Streamerfy_Logo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Streamerfy_Logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\Streamerfy_Logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />

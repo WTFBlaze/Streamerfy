@@ -175,7 +175,7 @@
                     CornerRadius="10,10,0,0"
                     MouseLeftButtonDown="Header_MouseLeftButtonDown">
                 <Grid>
-                    <TextBlock Text="Streamerfy"
+                    <TextBlock Text="Streamerfy v1.0.0"
                                FontSize="16"
                                Foreground="White"
                                VerticalAlignment="Center"
