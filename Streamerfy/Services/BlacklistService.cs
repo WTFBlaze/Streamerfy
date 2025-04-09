@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Streamerfy.Data.Internal.Json;
 using System.IO;
-using static Swan.Terminal;
-using System.Windows;
+using System.Net.Http;
+using System.Windows.Media;
 
 namespace Streamerfy.Services
 {
@@ -17,7 +17,7 @@ namespace Streamerfy.Services
             => Load();
 
         #region Tracks
-        public bool IsTrackBlacklisted(string id) => Tracks.Contains(id);
+        public bool IsTrackBlacklisted(string id) => Tracks.Contains(id) || Global.Contains(id);
 
         public void AddTrack(string id)
         {
@@ -109,6 +109,28 @@ namespace Streamerfy.Services
                 var json = File.ReadAllText(App.UserBlacklistFile);
                 Users = JsonConvert.DeserializeObject<HashSet<string>>(json) ?? new();
             }
+
+            // Fetch Global Track Blacklist
+            Task.Run(async () =>
+            {
+                try
+                {
+                    Global = await FetchGlobalBlacklistAsync();
+                    MainWindow.Instance.AddLog("✅ Fetched Global Track Blacklist!", Colors.LimeGreen);
+                }
+                catch (Exception ex)
+                {
+                    MainWindow.Instance.AddLog($"⚠️ Failed to fetch Global Track Blacklist! | Err: {ex.Message}", Colors.Red);
+                }
+            });
+        }
+
+        private async Task<HashSet<string>> FetchGlobalBlacklistAsync()
+        {
+            using var http = new HttpClient();
+            var response = await http.GetStringAsync("https://raw.githubusercontent.com/WTFBlaze/Streamerfy/refs/heads/master/GlobalBlacklist.txt");
+            var lines = response.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return new HashSet<string>(lines);
         }
         #endregion
     }
