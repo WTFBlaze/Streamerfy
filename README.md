@@ -25,6 +25,14 @@ Made with ❤️ for streamers who want more from their community.
 
 ---
 
+## 🆓 Always Free & Open Source
+Streamerfy is — and always will be — **100% free** and **open source**.  
+No paywalls, no subscriptions, no shady unlocks. Just good software, built for the community.
+
+> 💖 If you enjoy using Streamerfy and want to support development, you can [buy me a Ko-fi](https://ko-fi.com/wtfblaze)!
+
+---
+
 ## 🛠 Requirements
 
 - Windows 10 or 11
@@ -74,11 +82,29 @@ Streamerfy runs **entirely on your machine**, with no cloud-based commands, no s
 
 ---
 
-## 🆓 Always Free & Open Source
-Streamerfy is — and always will be — **100% free** and **open source**.  
-No paywalls, no subscriptions, no shady unlocks. Just good software, built for the community.
+## 📝 To-Do List
 
-> 💖 If you enjoy using Streamerfy and want to support development, you can [buy me a Ko-fi](https://ko-fi.com/wtfblaze)!
+Planned features and future improvements:
+
+- [x] Spotify queue integration 🎧
+- [x] Twitch chat command handling 💬
+- [x] Track & artist blacklist support 🚫
+- [x] Explicit content filtering 🔞
+- [x] Global blacklist support 🌐
+- [x] Standalone `.exe` build 📦
+- [x] Toggleable UI sections for sensitive info 🔐
+- [ ] Command permission roles (VIPs, Subs, etc.) 🛡️
+- [ ] Custom command aliases 🎭
+- [ ] Playback history tracking 🕒
+- [ ] Command usage limits (cooldowns, spam prevention) ⏱️
+- [ ] Discord webhook integration for log mirroring 🔗
+- [ ] Update Checker
+- [ ] Twitch Channel Points Redeem
+- [ ] TikTok Live Integration
+- [ ] Language Localizations (Currently Program is hard coded with english and I'd love to add proper translation files)
+
+> Have a feature request? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or drop it in the Discussions tab!
+
 
 ## 👨‍💻 Dev & Build
 
