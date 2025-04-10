@@ -3,6 +3,7 @@ using Streamerfy.Services;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -52,7 +53,9 @@ namespace Streamerfy
         #region Tab Switching Logic
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            TitleVersionText.Text = $"Streamerfy v{VersionService.CurrentVersion}";
             ShowTab(ShowTabType.LOGS);
+            CheckForUpdates();
 
             // Process Auto Connect
             if (AutoConnectToggle.IsChecked == true)
@@ -71,10 +74,12 @@ namespace Streamerfy
         {
             // Set Visbility
             LogsPanel.Visibility = type == ShowTabType.LOGS ? Visibility.Visible : Visibility.Collapsed;
+            ChangelogPanel.Visibility = type == ShowTabType.CHANGELOGS ? Visibility.Visible : Visibility.Collapsed;
             SettingsPanel.Visibility = type == ShowTabType.SETTINGS ? Visibility.Visible : Visibility.Collapsed;
 
             // Set Tab Highlights
             TabLogs.Tag = type == ShowTabType.LOGS ? "selected" : null;
+            TabChangelog.Tag = type == ShowTabType.CHANGELOGS ? "selected" : null;
             TabSettings.Tag = type == ShowTabType.SETTINGS ? "selected" : null;
         }
 
@@ -83,6 +88,9 @@ namespace Streamerfy
 
         private void Tab_Settings_Click(object sender, RoutedEventArgs e)
             => ShowTab(ShowTabType.SETTINGS);
+
+        private void Tab_Changelog_Click(object sender, RoutedEventArgs e)
+            => ShowTab(ShowTabType.CHANGELOGS);
         #endregion
 
         #region Logs Logic
@@ -116,6 +124,34 @@ namespace Streamerfy
                 LogBox.ScrollToEnd();
             }
         }
+
+        private async void CheckForUpdates()
+        {
+            var (updateAvailable, latest) = await VersionService.CheckForUpdatesAsync();
+            if (updateAvailable)
+                MainWindow.Instance.AddLog($"🔔 A new version of Streamerfy ({latest}) is available (You're on {VersionService.CurrentVersion})! Download at https://github.com/WTFBlaze/Streamerfy/releases", Colors.Yellow);
+        }
+        #endregion
+
+        #region Changelogs Logic
+        private void ChangelogToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton button && button.Tag is string panelName)
+            {
+                var panel = FindName(panelName) as StackPanel;
+                if (panel != null) panel.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ChangelogToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton button && button.Tag is string panelName)
+            {
+                var panel = FindName(panelName) as StackPanel;
+                if (panel != null) panel.Visibility = Visibility.Collapsed;
+            }
+        }
+
         #endregion
 
         #region Settings Logic

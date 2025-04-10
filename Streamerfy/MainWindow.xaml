@@ -5,9 +5,9 @@
         Height="500" Width="800"
         WindowStyle="None"
         ResizeMode="NoResize"
-        AllowsTransparency="False"
-        Background="#1e1e1e">
-    
+        AllowsTransparency="True"
+        Background="Transparent">
+
     <Window.Resources>
         <!-- Close Button Style -->
         <Style x:Key="RoundedCloseButtonStyle" TargetType="Button">
@@ -159,8 +159,8 @@
             </Setter>
         </Style>
     </Window.Resources>
-    
-    <Border Background="#1e1e1e" CornerRadius="10" BorderBrush="#444" BorderThickness="1">
+
+    <Border Background="#1e1e1e" CornerRadius="10" BorderBrush="#444" BorderThickness="1" ClipToBounds="True">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/> <!-- Header -->
@@ -175,11 +175,11 @@
                     CornerRadius="10,10,0,0"
                     MouseLeftButtonDown="Header_MouseLeftButtonDown">
                 <Grid>
-                    <TextBlock Text="Streamerfy v1.0.0"
-                               FontSize="16"
-                               Foreground="White"
-                               VerticalAlignment="Center"
-                               Margin="10,0"/>
+                    <TextBlock x:Name="TitleVersionText"
+                        FontSize="16"
+                        Foreground="White"
+                        VerticalAlignment="Center"
+                        Margin="10,0"/>
                     <Button Style="{StaticResource RoundedCloseButtonStyle}"
                             Content="✕"
                             Click="Close_Click"
@@ -195,7 +195,12 @@
                     Content="Logs"
                     Style="{StaticResource TabButtonStyle}"
                     Click="Tab_Logs_Click"/>
-                
+
+                <Button x:Name="TabChangelog"
+                    Content="Changelog"
+                    Style="{StaticResource TabButtonStyle}"
+                    Click="Tab_Changelog_Click"/>
+
                 <Button x:Name="TabSettings"
                     Content="Settings"
                     Style="{StaticResource TabButtonStyle}"
@@ -235,6 +240,60 @@
                     Padding="5"
                     Margin="10"/>
             </Grid>
+
+            <!-- Changelogs Panel -->
+            <ScrollViewer x:Name="ChangelogPanel"
+              Grid.Row="2"
+              Visibility="Collapsed"
+              Margin="10"
+              Background="#252526"
+              VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Margin="10" Orientation="Vertical">
+                    <TextBlock Text="Changelog"
+                   Foreground="White"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+                    <!-- Version 1.0.1 -->
+                    <ToggleButton Content="v1.0.1"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_0_1"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_1"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Added auto-update checker" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added now playing service" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added NowPlaying.html and NowPlaying.txt OBS support" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Performance improvements" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added Changelog Tab" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
+                    <!-- Version 1.0.0 -->
+                    <ToggleButton Content="v1.0.0"
+                      Style="{StaticResource SectionToggleButtonStyle}"
+                      IsChecked="false"
+                      Checked="ChangelogToggle_Checked"
+                      Unchecked="ChangelogToggle_Unchecked"
+                      Tag="Changelog_v1_0_0"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_0"
+                    Visibility="Collapsed"
+                    Margin="10,0,0,15">
+                        <TextBlock Text="• Initial release of Streamerfy" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Twitch chat song queuing" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Artist, Track and User blacklisting" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Explicit song blocking" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
+                    <!-- Add more versions here -->
+                </StackPanel>
+            </ScrollViewer>
 
             <!-- Settings Panel -->
             <ScrollViewer x:Name="SettingsPanel"
