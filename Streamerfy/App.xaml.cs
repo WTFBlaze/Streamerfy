@@ -4,6 +4,7 @@ using Streamerfy.Services;
 using System.Configuration;
 using System.Data;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 
@@ -17,15 +18,29 @@ namespace Streamerfy
         public static AppSettings Settings { get; set; }
         public static string RoamingFolder { get; private set; }
         public static string SettingsFile { get; private set; }
+        
+        public static string BlacklistFolder { get; private set; }
         public static string SongBlacklistFile { get; private set; }
         public static string ArtistBlacklistFile { get; private set; }
         public static string UserBlacklistFile { get; private set; }
+
+        public static string NowPlayingFolder { get; private set; }
+        public static string NowPlayingJSONFile { get; private set; }
+        public static string NowPlayingHTMLFile { get; private set; }
+        public static string NowPlayingTXTFile { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             if (!SetupRoamingFiles() || !SetupAppSettings()) return;
+            EnsureNowPlayingHtmlExists();
             ServiceManager.InitializeServices();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            ServiceManager.NowPlaying.Clear();
         }
 
         private bool SetupRoamingFiles()
@@ -33,14 +48,21 @@ namespace Streamerfy
             try
             {
                 var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                RoamingFolder = Path.Combine(appDataPath, "Streamerfy");
-                if (!Directory.Exists(RoamingFolder))
-                    Directory.CreateDirectory(RoamingFolder);
 
-                SettingsFile = Path.Combine(RoamingFolder, "Settings.json");
-                SongBlacklistFile = Path.Combine(RoamingFolder, "Blacklist_Tracks.json");
-                ArtistBlacklistFile = Path.Combine(RoamingFolder, "Blacklist_Artists.json");
-                UserBlacklistFile = Path.Combine(RoamingFolder, "Blacklist_Users.json");
+                // Ensure Directories
+                RoamingFolder = EnsureDirectoryExistance(appDataPath, "Streamerfy");
+                BlacklistFolder = EnsureDirectoryExistance(RoamingFolder, "Blacklist");
+                NowPlayingFolder = EnsureDirectoryExistance(RoamingFolder, "NowPlaying");
+
+                // Ensure Files
+                SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json");
+                SongBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Tracks.json");
+                ArtistBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Artists.json");
+                UserBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Users.json");
+                NowPlayingJSONFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.json");
+                NowPlayingHTMLFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.html", false);
+                NowPlayingTXTFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.txt");
+
                 return true;
             }
             catch (Exception ex)
@@ -50,6 +72,7 @@ namespace Streamerfy
             }
         }
 
+        #region App Settings Methods
         private bool SetupAppSettings()
         {
             try
@@ -89,6 +112,55 @@ namespace Streamerfy
             var content = JsonConvert.SerializeObject(Settings, Formatting.Indented);
             File.WriteAllText(SettingsFile, content);
         }
+        #endregion
+
+        #region Existance Methods
+        private void EnsureNowPlayingHtmlExists()
+        {
+            if (File.Exists(NowPlayingHTMLFile)) 
+                return;
+
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                const string resourceName = "Streamerfy.Assets.NowPlayingTemplate.html";
+
+                using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null)
+                {
+                    MessageBox.Show("Failed to load NowPlaying.html from resources.", "Streamerfy", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                using var reader = new StreamReader(stream);
+                string html = reader.ReadToEnd();
+                File.WriteAllText(NowPlayingHTMLFile, html);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error writing NowPlaying.html:\n{ex.Message}", "Streamerfy", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private string EnsureDirectoryExistance(string path, string directoryName)
+        {
+            var fullPath = Path.Combine(path, directoryName);
+            if (!Directory.Exists(fullPath))
+                Directory.CreateDirectory(fullPath);
+            return fullPath;
+        }
+
+        private string EnsureFileExistance(string path, string fileName, bool createFile = true)
+        {
+            var fullPath = Path.Combine(path, fileName);
+            if (createFile) // this technically defeats the point of the method but I don't want to create the NowPlaying.html file. Only set it's path.
+            {
+                if (!File.Exists(fullPath))
+                    File.Create(fullPath).Close();
+            }
+            return fullPath;
+        }
+        #endregion
     }
 
 }

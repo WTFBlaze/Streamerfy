@@ -12,22 +12,29 @@ namespace Streamerfy.Services
         private readonly EmbedIOAuthServer _server;
         private SpotifyClient _client;
         private readonly BlacklistService _blacklist;
+        private readonly NowPlayingService _nowPlaying;
 
         private readonly string _clientId;
         private readonly string _clientSecret;
 
+        private string _lastTrackId = "";
+        private bool _lastIsPlaying = true;
+        private Timer _pollTimer;
+
         public bool IsConnected => _client != null;
 
-        public SpotifyService(BlacklistService blacklist)
+        public SpotifyService(BlacklistService blacklist, NowPlayingService nowPlaying)
         {
             _clientId = App.Settings.SpotifyClientId;
             _clientSecret = App.Settings.SpotifyClientSecret;
             _blacklist = blacklist;
+            _nowPlaying = nowPlaying;
 
             _server = new EmbedIOAuthServer(new Uri(CallbackUrl), 5543);
             StartAuthFlow();
         }
 
+        #region Initialization Methods
         private void StartAuthFlow()
         {
             Task.Run(async () =>
@@ -50,6 +57,49 @@ namespace Streamerfy.Services
             });
         }
 
+        private void StartPolling()
+        {
+            _pollTimer = new Timer(async _ =>
+            {
+                try
+                {
+                    var playing = await _client.Player.GetCurrentlyPlaying(new());
+                    var playback = await _client.Player.GetCurrentPlayback();
+
+                    var track = playing?.Item as FullTrack;
+                    bool isPlaying = playback?.IsPlaying ?? false;
+
+                    if (track == null)
+                    {
+                        _nowPlaying.Clear();
+                        _lastTrackId = "";
+                        _lastIsPlaying = false;
+                        return;
+                    }
+
+                    // If track changed
+                    if (track.Id != _lastTrackId)
+                    {
+                        _lastTrackId = track.Id;
+                        _lastIsPlaying = isPlaying;
+                        OnSongChanged(track, isPlaying);
+                    }
+                    // If playback state changed
+                    else if (isPlaying != _lastIsPlaying)
+                    {
+                        _lastIsPlaying = isPlaying;
+                        OnPlaybackToggled(track, isPlaying);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MainWindow.Instance.AddLog($"⚠️ Polling error: {ex.Message}", Colors.OrangeRed);
+                }
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5)); // poll every 5s
+        }
+        #endregion
+
+        #region Event Methods
         private async Task OnErrorReceived(object sender, string error, string? state)
         {
             MainWindow.Instance.AddLog($"⚠️ Spotify Authorization Error: {error}.", Colors.OrangeRed);
@@ -68,8 +118,34 @@ namespace Streamerfy.Services
             _client = new SpotifyClient(token);
 
             MainWindow.Instance.AddLog("✅ Spotify Authorized!", Colors.LimeGreen);
+            StartPolling();
         }
 
+        private void OnSongChanged(FullTrack track, bool isPlaying)
+        {
+            string trackName = track.Name;
+            string artistName = track.Artists.FirstOrDefault()?.Name ?? "Unknown";
+            string coverUrl = track.Album.Images.FirstOrDefault()?.Url ?? "";
+
+            MainWindow.Instance.AddLog($"🎵 Now Playing {trackName} - {artistName}", Colors.CornflowerBlue);
+            _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
+        }
+
+        private void OnPlaybackToggled(FullTrack track, bool isPlaying)
+        {
+            string trackName = track.Name;
+            string artistName = track.Artists.FirstOrDefault()?.Name ?? "Unknown";
+            string coverUrl = track.Album.Images.FirstOrDefault()?.Url ?? "";
+
+            string statusText = isPlaying ? "▶️ Resumed" : "⏸️ Paused";
+            var color = isPlaying ? Colors.LightGreen : Colors.Orange;
+
+            MainWindow.Instance.AddLog($"{statusText} {trackName} - {artistName}", color);
+            _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
+        }
+        #endregion
+
+        #region Misc Methods
         public async Task<bool> AddToQueue(string url)
         {
             var track = await GetTrackInfo(url);
@@ -133,5 +209,6 @@ namespace Streamerfy.Services
                 Name = artist.Name
             };
         }
+        #endregion
     }
 }

@@ -16,7 +16,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\NowPlayingTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Streamerfy_Logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\NowPlayingTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>
