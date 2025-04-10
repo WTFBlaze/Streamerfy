@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Streamerfy.Data.Internal.Json;
+using Streamerfy.Windows;
 using System.IO;
 using System.Net.Http;
 using System.Windows.Media;

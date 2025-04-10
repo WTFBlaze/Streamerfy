@@ -1,4 +1,5 @@
 ﻿using Streamerfy.Data.Internal.Enums;
+using Streamerfy.Data.Internal.Json;
 using Streamerfy.Services;
 using System.Text;
 using System.Windows;
@@ -11,10 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static SpotifyAPI.Web.PlayerSetRepeatRequest;
-using static Swan.Terminal;
 
-namespace Streamerfy
+namespace Streamerfy.Windows
 {
     public partial class MainWindow : Window
     {
@@ -74,11 +73,13 @@ namespace Streamerfy
         {
             // Set Visbility
             LogsPanel.Visibility = type == ShowTabType.LOGS ? Visibility.Visible : Visibility.Collapsed;
+            HistoryPanel.Visibility = type == ShowTabType.HISTORY ? Visibility.Visible : Visibility.Collapsed;
             ChangelogPanel.Visibility = type == ShowTabType.CHANGELOGS ? Visibility.Visible : Visibility.Collapsed;
             SettingsPanel.Visibility = type == ShowTabType.SETTINGS ? Visibility.Visible : Visibility.Collapsed;
 
             // Set Tab Highlights
             TabLogs.Tag = type == ShowTabType.LOGS ? "selected" : null;
+            TabHistory.Tag = type == ShowTabType.HISTORY ? "selected" : null;
             TabChangelog.Tag = type == ShowTabType.CHANGELOGS ? "selected" : null;
             TabSettings.Tag = type == ShowTabType.SETTINGS ? "selected" : null;
         }
@@ -91,6 +92,13 @@ namespace Streamerfy
 
         private void Tab_Changelog_Click(object sender, RoutedEventArgs e)
             => ShowTab(ShowTabType.CHANGELOGS);
+
+        private void Tab_History_Click(object sender, RoutedEventArgs e)
+        {
+            ShowTab(ShowTabType.HISTORY);
+            RefreshHistoryList();
+        }
+
         #endregion
 
         #region Logs Logic
@@ -131,6 +139,106 @@ namespace Streamerfy
             if (updateAvailable)
                 MainWindow.Instance.AddLog($"🔔 A new version of Streamerfy ({latest}) is available (You're on {VersionService.CurrentVersion})! Download at https://github.com/WTFBlaze/Streamerfy/releases", Colors.Yellow);
         }
+        #endregion
+
+        #region Playback History Logic
+        public void RefreshHistoryList()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(RefreshHistoryList);
+            }
+            else
+            {
+                if (HistoryPanel.Visibility == Visibility.Visible)
+                {
+                    HistoryList.ItemsSource = null;
+                    HistoryList.ItemsSource = ServiceManager.Playback.Entries.OrderByDescending(h => h.Timestamp);
+                }
+            }
+        }
+
+        private void ClearHistory_Click(object sender, RoutedEventArgs e)
+        {
+            bool confirm = ShowConfirmation("Are you sure you want to clear the playback history? This cannot be undone.");
+            if (!confirm) return;
+
+            ServiceManager.Playback.Clear();
+            HistoryList.ItemsSource = null;
+            HistoryList.ItemsSource = ServiceManager.Playback.Entries.OrderByDescending(h => h.Timestamp);
+
+            ShowInfo("Playback history was successfully cleared.");
+        }
+
+
+        private void Playback_Requeue_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is PlaybackEntry entry)
+            {
+                Task.Run(async () =>
+                {
+                    await ServiceManager.Spotify.AddToQueue($"https://open.spotify.com/track/{entry.TrackId}", "Streamer");
+                    AddLog($"🔁 Re-added {entry.TrackName} by {entry.ArtistName} to queue.", Colors.LightGreen);
+                });
+            }
+        }
+
+        private void Playback_BlacklistTrack_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is PlaybackEntry entry)
+            {
+                if (ShowConfirmation($"Are you sure you want to blacklist this track?\n\n{entry.TrackName} by {entry.ArtistName}"))
+                {
+                    ServiceManager.Blacklist.AddTrack(entry.TrackId);
+                    AddLog($"🚫 Blacklisted track: {entry.TrackName}", Colors.OrangeRed);
+                }
+            }
+        }
+
+        private void Playback_BlacklistArtist_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is PlaybackEntry entry)
+            {
+                if (ShowConfirmation($"Are you sure you want to blacklist this artist?\n\n{entry.ArtistName}"))
+                {
+                    ServiceManager.Blacklist.AddArtist(entry.ArtistId);
+                    AddLog($"🧑‍🎤🚫 Blacklisted artist: {entry.ArtistName}", Colors.OrangeRed);
+                }
+            }
+        }
+
+        private void Playback_BanUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is PlaybackEntry entry)
+            {
+                #region Idiot Proofing lol
+                if (entry.RequestedBy == "Unknown")
+                {
+                    ShowInfo("Unknown user to ban!");
+                    return;
+                }
+
+                if (entry.RequestedBy == "Spotify (Autoplay/Shuffle)")
+                {
+                    ShowInfo("You cannot ban Spotify!");
+                    return;
+                }
+
+                if (entry.RequestedBy == "Streamer")
+                {
+                    ShowInfo("You cannot ban yourself!");
+                    return;
+                }
+                #endregion
+
+                if (ShowConfirmation($"Are you sure you want to blacklist this artist?\n\n{entry.ArtistName}"))
+                {
+                    ServiceManager.Blacklist.AddUser(entry.RequestedBy);
+                    AddLog($"🔨 Banned requester: {entry.RequestedBy}", Colors.OrangeRed);
+                }
+            }
+        }
+
         #endregion
 
         #region Changelogs Logic
@@ -213,6 +321,25 @@ namespace Streamerfy
         #endregion
 
         #region Misc UI Logic
+        public bool ShowConfirmation(string message)
+        {
+            var dialog = new ConfirmDialog(message)
+            {
+                Owner = this
+            };
+            dialog.ShowDialog();
+            return dialog.Result;
+        }
+
+        public void ShowInfo(string message)
+        {
+            var dialog = new InfoDialog(message)
+            {
+                Owner = this
+            };
+            dialog.ShowDialog();
+        }
+
         public void SetConnectionStatus(string channelName)
         {
             if (!Dispatcher.CheckAccess())

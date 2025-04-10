@@ -3,6 +3,7 @@
     public enum ShowTabType
     {
         LOGS,
+        HISTORY,
         CHANGELOGS,
         SETTINGS
     }

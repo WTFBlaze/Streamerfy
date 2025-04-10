@@ -18,6 +18,7 @@ namespace Streamerfy
         public static AppSettings Settings { get; set; }
         public static string RoamingFolder { get; private set; }
         public static string SettingsFile { get; private set; }
+        public static string PlaybackFile { get; private set; }
         
         public static string BlacklistFolder { get; private set; }
         public static string SongBlacklistFile { get; private set; }
@@ -56,6 +57,7 @@ namespace Streamerfy
 
                 // Ensure Files
                 SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json");
+                PlaybackFile = EnsureFileExistance(RoamingFolder, "PlaybackHistory.json");
                 SongBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Tracks.json");
                 ArtistBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Artists.json");
                 UserBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Users.json");

@@ -2,6 +2,7 @@
 using SpotifyAPI.Web;
 using Streamerfy.Data.Internal.Service;
 using System.Windows.Media;
+using Streamerfy.Windows;
 
 namespace Streamerfy.Services
 {
@@ -13,6 +14,7 @@ namespace Streamerfy.Services
         private SpotifyClient _client;
         private readonly BlacklistService _blacklist;
         private readonly NowPlayingService _nowPlaying;
+        private readonly PlaybackHistoryService _playbackHistory;
 
         private readonly string _clientId;
         private readonly string _clientSecret;
@@ -21,14 +23,17 @@ namespace Streamerfy.Services
         private bool _lastIsPlaying = true;
         private Timer _pollTimer;
 
+        private readonly Dictionary<string, string> _requestedTracks = new();
+
         public bool IsConnected => _client != null;
 
-        public SpotifyService(BlacklistService blacklist, NowPlayingService nowPlaying)
+        public SpotifyService(BlacklistService blacklist, NowPlayingService nowPlaying, PlaybackHistoryService playbackHistoryService)
         {
             _clientId = App.Settings.SpotifyClientId;
             _clientSecret = App.Settings.SpotifyClientSecret;
             _blacklist = blacklist;
             _nowPlaying = nowPlaying;
+            _playbackHistory = playbackHistoryService;
 
             _server = new EmbedIOAuthServer(new Uri(CallbackUrl), 5543);
             StartAuthFlow();
@@ -126,10 +131,34 @@ namespace Streamerfy.Services
             string trackName = track.Name;
             string artistName = track.Artists.FirstOrDefault()?.Name ?? "Unknown";
             string coverUrl = track.Album.Images.FirstOrDefault()?.Url ?? "";
+            string trackId = track.Id;
 
-            MainWindow.Instance.AddLog($"🎵 Now Playing {trackName} - {artistName}", Colors.CornflowerBlue);
+            // Check if the track was requested by someone
+            string requestedBy = _requestedTracks.TryGetValue(trackId, out var name)
+                ? name
+                : "Spotify (Autoplay/Shuffle)";
+
+            MainWindow.Instance.AddLog($"🎵 Now Playing {trackName} - {artistName} (Requested by {requestedBy})", Colors.CornflowerBlue);
             _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
+            _playbackHistory.Add(new SpotifyTrack
+            {
+                AlbumArtUrl = coverUrl,
+                ID = trackId,
+                Explicit = track.Explicit,
+                Name = trackName,
+                Artist = new()
+                {
+                    ID = track.Artists.FirstOrDefault()?.Id ?? "",
+                    Name = artistName
+                }
+            }, requestedBy);
+
+            // Remove from memory once used
+            _requestedTracks.Remove(trackId);
+
+            MainWindow.Instance.RefreshHistoryList();
         }
+
 
         private void OnPlaybackToggled(FullTrack track, bool isPlaying)
         {
@@ -146,20 +175,19 @@ namespace Streamerfy.Services
         #endregion
 
         #region Misc Methods
-        public async Task<bool> AddToQueue(string url)
+        public async Task<bool> AddToQueue(string url, string requestedBy = "Unknown")
         {
             var track = await GetTrackInfo(url);
-            if (track == null)
-                return false;
+            if (track == null) return false;
 
-            if (_blacklist.IsTrackBlacklisted(track.ID))
-                return false;
-
-            if (_blacklist.IsArtistBlacklisted(track.Artist.ID))
-                return false;
+            if (_blacklist.IsTrackBlacklisted(track.ID)) return false;
+            if (_blacklist.IsArtistBlacklisted(track.Artist.ID)) return false;
 
             var uri = $"spotify:track:{track.ID}";
             await _client.Player.AddToQueue(new PlayerAddToQueueRequest(uri));
+
+            // Store who requested it
+            _requestedTracks[track.ID] = requestedBy;
 
             return true;
         }

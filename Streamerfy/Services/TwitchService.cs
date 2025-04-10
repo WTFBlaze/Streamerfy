@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Streamerfy.Windows;
+using System.Collections.Concurrent;
 using System.Windows.Media;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;

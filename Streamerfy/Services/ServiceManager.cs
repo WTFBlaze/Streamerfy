@@ -4,6 +4,7 @@
     {
         public static BlacklistService Blacklist { get; private set; }
         public static SpotifyService Spotify { get; private set; }
+        public static PlaybackHistoryService Playback { get; private set; }
         public static TwitchService Twitch { get; private set; }
         public static NowPlayingService NowPlaying { get; private set; }
 
@@ -11,7 +12,8 @@
         {
             Blacklist = new BlacklistService();
             NowPlaying = new NowPlayingService();
-            Spotify = new SpotifyService(Blacklist, NowPlaying);
+            Playback = new PlaybackHistoryService();
+            Spotify = new SpotifyService(Blacklist, NowPlaying, Playback);
             Twitch = new TwitchService(
                 Spotify,
                 Blacklist
