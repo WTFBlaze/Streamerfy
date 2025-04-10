@@ -1,5 +1,9 @@
 # 🎵 Streamerfy
 
+[![Latest Version](https://img.shields.io/github/v/tag/WTFBlaze/Streamerfy?style=flat-square)](https://github.com/WTFBlaze/Streamerfy/releases)
+[![Platform](https://img.shields.io/badge/platform-windows-blue?style=flat-square)](#requirements)
+[![License](https://img.shields.io/github/license/WTFBlaze/Streamerfy?style=flat-square)](LICENSE)
+
 **Let your Twitch chat take over your Spotify queue — safely, securely, and with style.**
 
 Streamerfy connects your Twitch chat to your Spotify queue, letting viewers request songs using simple commands like `!queue`. With blacklist controls, explicit content filtering, and Twitch moderation tools — it's built for streamers who want their community involved without chaos.
