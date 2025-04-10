@@ -72,9 +72,9 @@ Planned features and future improvements:
 - [x] Standalone `.exe` build
 - [x] NowPlaying.html OBS overlay
 - [x] Auto-update checker
+- [x] Playback history
 - [ ] Permission roles (VIPs, Subs, Mods)
 - [ ] Command cooldowns / spam protection
-- [ ] Playback history
 - [ ] Discord webhook integration
 - [ ] Twitch Channel Point Redeems
 - [ ] TikTok Live integration
