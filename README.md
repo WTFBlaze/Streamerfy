@@ -45,7 +45,7 @@ No paywalls. No premium unlocks. Just good software made for streamers.
 - Windows 10 or 11
 - Spotify Premium account
 - Twitch account with OAuth token
-- [.NET 6 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- [.NET 6 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.36-windows-x64-installer)
 
 ---
 
