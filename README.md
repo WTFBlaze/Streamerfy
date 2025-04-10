@@ -1,35 +1,42 @@
 # 🎵 Streamerfy
 
+[![Latest Version](https://img.shields.io/github/v/tag/WTFBlaze/Streamerfy?style=flat-square)](https://github.com/WTFBlaze/Streamerfy/releases)
+[![Platform](https://img.shields.io/badge/platform-windows-blue?style=flat-square)](#requirements)
+[![License](https://img.shields.io/github/license/WTFBlaze/Streamerfy?style=flat-square)](LICENSE)
+
 **Let your Twitch chat take over your Spotify queue — safely, securely, and with style.**
 
-Streamerfy lets streamers connect their Twitch chat to Spotify, allowing viewers to request songs using simple commands like `!queue`. Have no fear with blacklist controls, explicit content filters, and real-time queuing — it’s a must-have for music-loving streamers.  
+Streamerfy connects your Twitch chat to your Spotify queue, letting viewers request songs using simple commands like `!queue`. With blacklist controls, explicit content filtering, and Twitch moderation tools — it's built for streamers who want their community involved without chaos.
 
-Made with ❤️ for streamers who want more from their community.
+Made with ❤️ for creators who want more from their music streams.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- ✅ **Live Twitch chat integration**
-- 🎧 **Real-time Spotify queueing**
-- 🚫 **Blacklist support** (track & artist level)
-- 🔞 **Explicit content filtering**
-- 🖥️ **Clean, dark-themed User Interface**
-- 📦 **One-click standalone `.exe` build**
+- 🎧 **Spotify Playback Control** – Queue songs via Twitch chat
+- 💬 **Custom Commands** – Supports `!queue`, `!blacklist`, and more
+- 🚫 **Blacklist Management** – Block specific songs or artists
+- 🔞 **Explicit Filter** – Toggle on/off based on your vibe
+- 🧩 **Global Blacklist** – Community-powered banned songs
+- 🎥 **OBS Now Playing Overlay** – Auto-updating HTML overlay for your stream
+- 🧼 **Local Only** – No servers, no tracking. Your data stays with you.
+- 🛠️ **One-Click Build** – Compiles to a single `.exe` (no installer required)
 
 ---
 
 ## 🖼 Preview
 
-![Streamerfy UI Preview](https://github.com/WTFBlaze/Streamerfy/blob/master/Images/Showcase.png?raw=true) <!-- You can replace this with a real link or remove it -->
+![Streamerfy UI Preview](https://github.com/WTFBlaze/Streamerfy/blob/master/Images/Showcase.png?raw=true)
 
 ---
 
 ## 🆓 Always Free & Open Source
-Streamerfy is — and always will be — **100% free** and **open source**.  
-No paywalls, no subscriptions, no shady unlocks. Just good software, built for the community.
 
-> 💖 If you enjoy using Streamerfy and want to support development, you can [buy me a Ko-fi](https://ko-fi.com/wtfblaze)!
+Streamerfy is — and always will be — **100% free** and **open source**.  
+No paywalls. No premium unlocks. Just good software made for streamers.
+
+> 💖 Like my work? [Buy me a Ko-fi](https://ko-fi.com/wtfblaze) to support development.
 
 ---
 
@@ -37,48 +44,19 @@ No paywalls, no subscriptions, no shady unlocks. Just good software, built for t
 
 - Windows 10 or 11
 - Spotify Premium account
-- Twitch account with OAuth token (can be streamer account or alt account)
+- Twitch account with OAuth token
 - [.NET 6 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 🔹 1. Download
-Download the latest release from the [Releases](https://github.com/WTFBlaze/Streamerfy/releases) page.
+1. **[Download the latest release](https://github.com/WTFBlaze/Streamerfy/releases)**
+2. **Run `Streamerfy.exe`**
+3. **Configure settings:** Twitch account, OAuth token, Spotify app credentials
+4. **Connect and start queuing songs!**
 
-### 🔹 2. Launch
-Run `Streamerfy.exe`.
-
-### 🔹 3. Configure Settings
-- Enter your bot username and OAuth token
-- Set your Twitch channel and [Spotify App Credentials](https://developer.spotify.com/dashboard)
-- Enable "Auto-connect" if desired
-
-### 🔹 4. Commands (default)
-| Command        | Description                         |
-|----------------|-------------------------------------|
-| `!queue <url>`  | Adds a Spotify track to the queue   |
-| `!blacklist song <url>` | Mods can blacklist a song   |
-| `!unblacklist song <url>` | Mods can unblacklist a song |
-| `!blacklist artist <url>` | Mods can blacklist an artist |
-| `!unblacklist artist <url>` | Mods can unblacklist an artist |
-| `!rban <username>` | Mods can ban users from using Streamerfy commands |
-| `!runban <username>` | Mods can unban users from using Streamerfy commands |
-
----
-
-## 🧠 Advanced Features
-
-- 🧩 **Global blacklist** support via remote list (For those absolute must blacklist songs that are not content creator friendly)
-- 🔄 **Auto-connect** on launch
-- 🎨 Toggleable UI sections to hide sensitive info
-
----
-
-## 🛡️ Safe & Streamer Friendly
-
-Streamerfy runs **entirely on your machine**, with no cloud-based commands, no server in the middle, and all logs are local. You're in full control.
+> ✅ Full setup walkthroughs, including OBS integration, are now in the [📚 Wiki](https://github.com/WTFBlaze/Streamerfy/wiki)
 
 ---
 
@@ -86,29 +64,27 @@ Streamerfy runs **entirely on your machine**, with no cloud-based commands, no s
 
 Planned features and future improvements:
 
-- [x] Spotify queue integration 🎧
-- [x] Twitch chat command handling 💬
-- [x] Track & artist blacklist support 🚫
-- [x] Explicit content filtering 🔞
-- [x] Global blacklist support 🌐
-- [x] Standalone `.exe` build 📦
-- [x] Toggleable UI sections for sensitive info 🔐
-- [ ] Command permission roles (VIPs, Subs, etc.) 🛡️
-- [ ] Custom command aliases 🎭
-- [ ] Playback history tracking 🕒
-- [ ] Command usage limits (cooldowns, spam prevention) ⏱️
-- [ ] Discord webhook integration for log mirroring 🔗
-- [ ] Update Checker
-- [ ] Twitch Channel Points Redeem
-- [ ] TikTok Live Integration
-- [ ] Language Localizations (Currently Program is hard coded with english and I'd love to add proper translation files)
+- [x] Spotify integration
+- [x] Twitch chat command handling
+- [x] Track & artist blacklist support
+- [x] Explicit content filtering
+- [x] Global blacklist
+- [x] Standalone `.exe` build
+- [x] NowPlaying.html OBS overlay
+- [x] Auto-update checker
+- [ ] Permission roles (VIPs, Subs, Mods)
+- [ ] Command cooldowns / spam protection
+- [ ] Playback history
+- [ ] Discord webhook integration
+- [ ] Twitch Channel Point Redeems
+- [ ] TikTok Live integration
+- [ ] Language localizations (currently English only)
 
-> Have a feature request? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or drop it in the Discussions tab!
+> Got an idea? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or leave feedback in [Discussions](https://github.com/WTFBlaze/Streamerfy/discussions)
 
+---
 
-## 👨‍💻 Dev & Build
-
-To build the project yourself:
+## 👨‍💻 Building from Source
 
 ```bash
 git clone https://github.com/WTFBlaze/Streamerfy.git
