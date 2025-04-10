@@ -512,7 +512,7 @@
                         IsChecked="False"
                         Checked="SpotifySectionToggle_Checked"
                         Unchecked="SpotifySectionToggle_Unchecked"
-                        Margin="0,20,0,10"/>
+                        Margin="0,0,0,10"/>
 
                     <StackPanel x:Name="SpotifySettingsPanel"
                         Visibility="Collapsed"
@@ -532,6 +532,86 @@
                         <StackPanel Margin="0,0,0,10">
                             <TextBlock Text="Spotify Client Secret" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="ClientSecretField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Twitch Section -->
+                    <ToggleButton x:Name="CommandsSectionToggle"
+                        Content="Command Settings"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="False"
+                        Checked="CommandsSectionToggle_Checked"
+                        Unchecked="CommandsSectionToggle_Unchecked"
+                        Margin="0,0,0,10"/>
+
+                    <StackPanel x:Name="CommandsSectionPanel"
+                        Visibility="Collapsed"
+                        Margin="10,0,0,10">
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Prefix" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="CmdPrefixField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Queue Song" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="QueueCmdField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Blacklist Song / Artist" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="BlacklistCmdField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Unblacklist Song / Artist" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="UnblacklistCmdField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Ban User" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="BanUserCmdField"
+                                Background="#1e1e1e"
+                                Foreground="White"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Padding="5"
+                                FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Unban User" Foreground="White" FontSize="13"/>
+                            <TextBox x:Name="UnbanUserCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
                                 BorderBrush="#444"

@@ -91,14 +91,23 @@ namespace Streamerfy.Services
                 return;
             }
 
+            if (!e.ChatMessage.Message.StartsWith(App.Settings.CmdPrefix))
+                return;
+
             var split = msg.Split(' ');
-            var command = split[0].ToLower();
+            var rawCommand = split[0];
+            var prefix = App.Settings.CmdPrefix;
+
+            var command = rawCommand.StartsWith(prefix)
+                ? rawCommand.Substring(prefix.Length).ToLower()
+                : rawCommand.ToLower();
+
             var arg1 = split.Length > 1 ? split[1] : null;
             var arg2 = split.Length > 2 ? split[2] : null;
 
             switch (command)
             {
-                case var cmd when cmd is "!player" or "!request" or "!queue":
+                case var cmd when cmd == App.Settings.CmdQueue:
                     {
                         if (arg1 == null)
                         {
@@ -151,7 +160,7 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case "!blacklist":
+                case var cmd when cmd == App.Settings.CmdBlacklist:
                     {
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null || arg2 == null)
@@ -208,7 +217,7 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case "!unblacklist":
+                case var cmd when cmd == App.Settings.CmdUnblacklist:
                     {
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null || arg2 == null)
@@ -266,7 +275,7 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case "!rban":
+                case var cmd when cmd == App.Settings.CmdBan:
                     {
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null)
@@ -293,7 +302,7 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case "!runban":
+                case var cmd when cmd == App.Settings.CmdUnban:
                     {
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null)

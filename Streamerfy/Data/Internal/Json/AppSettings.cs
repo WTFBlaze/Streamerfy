@@ -9,5 +9,11 @@
         public string Channel { get; set; } = string.Empty;
         public string SpotifyClientId { get; set; } = string.Empty;
         public string SpotifyClientSecret { get; set; } = string.Empty;
+        public string CmdPrefix { get; set; } = "!";
+        public string CmdQueue { get; set; } = "queue";
+        public string CmdBlacklist { get; set; } = "blacklist";
+        public string CmdUnblacklist { get; set; } = "unblacklist";
+        public string CmdBan { get; set; } = "ban";
+        public string CmdUnban { get; set; } = "unban";
     }
 }

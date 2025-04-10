@@ -272,6 +272,12 @@ namespace Streamerfy.Windows
             ChannelField.Text = App.Settings.Channel ?? "";
             ClientIDField.Text = App.Settings.SpotifyClientId ?? "";
             ClientSecretField.Text = App.Settings.SpotifyClientSecret ?? "";
+            CmdPrefixField.Text = App.Settings.CmdPrefix ?? "";
+            QueueCmdField.Text = App.Settings.CmdQueue ?? "";
+            BlacklistCmdField.Text = App.Settings.CmdBlacklist ?? "";
+            UnblacklistCmdField.Text = App.Settings.CmdUnblacklist ?? "";
+            BanUserCmdField.Text = App.Settings.CmdBan ?? "";
+            UnbanUserCmdField.Text = App.Settings.CmdUnban ?? "";
         }
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
@@ -283,6 +289,12 @@ namespace Streamerfy.Windows
             App.Settings.Channel = ChannelField.Text;
             App.Settings.SpotifyClientId = ClientIDField.Text;
             App.Settings.SpotifyClientSecret = ClientSecretField.Text;
+            App.Settings.CmdPrefix = CmdPrefixField.Text;
+            App.Settings.CmdQueue = QueueCmdField.Text;
+            App.Settings.CmdBlacklist = BlacklistCmdField.Text;
+            App.Settings.CmdUnblacklist = UnblacklistCmdField.Text;
+            App.Settings.CmdBan = BanUserCmdField.Text;
+            App.Settings.CmdUnban = UnbanUserCmdField.Text;
             App.SaveAppSettings();
         }
 
@@ -317,6 +329,16 @@ namespace Streamerfy.Windows
         private void SpotifySectionToggle_Unchecked(object sender, RoutedEventArgs e)
         {
             SpotifySettingsPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void CommandsSectionToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            CommandsSectionPanel.Visibility = Visibility.Visible;
+        }
+
+        private void CommandsSectionToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CommandsSectionPanel.Visibility = Visibility.Collapsed;
         }
         #endregion
 
