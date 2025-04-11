@@ -9,6 +9,7 @@
         public string Channel { get; set; } = string.Empty;
         public string SpotifyClientId { get; set; } = string.Empty;
         public string SpotifyClientSecret { get; set; } = string.Empty;
+        public string Language { get; set; } = "en";
         public string CmdPrefix { get; set; } = "!";
         public string CmdQueue { get; set; } = "queue";
         public string CmdBlacklist { get; set; } = "blacklist";

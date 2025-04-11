@@ -1,12 +1,15 @@
 ﻿<Window x:Class="Streamerfy.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:services="clr-namespace:Streamerfy.Services"
         Title="Streamerfy"
         Height="500" Width="800"
         WindowStyle="None"
         ResizeMode="NoResize"
         AllowsTransparency="True"
-        Background="Transparent">
+        Background="Transparent"
+        DataContext="{x:Static services:LanguageService.ViewModel}">
+
 
     <Window.Resources>
         <!-- Close Button Style -->
@@ -224,22 +227,22 @@
             <!-- Tabs -->
             <StackPanel Grid.Row="1" Orientation="Horizontal" Background="#1f1f1f" Height="40">
                 <Button x:Name="TabLogs"
-                    Content="Logs"
+                    Content="{Binding Tabs_Logs}"
                     Style="{StaticResource TabButtonStyle}"
                     Click="Tab_Logs_Click"/>
 
                 <Button x:Name="TabHistory"
-                    Content="History"
+                    Content="{Binding Tabs_History}"
                     Style="{StaticResource TabButtonStyle}"
                     Click="Tab_History_Click"/>
 
                 <Button x:Name="TabChangelog"
-                    Content="Changelog"
+                    Content="{Binding Tabs_Changelog}"
                     Style="{StaticResource TabButtonStyle}"
                     Click="Tab_Changelog_Click"/>
 
                 <Button x:Name="TabSettings"
-                    Content="Settings"
+                    Content="{Binding Tabs_Settings}"
                     Style="{StaticResource TabButtonStyle}"
                     Click="Tab_Settings_Click"/>
             </StackPanel>
@@ -256,7 +259,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Logs Page"
+                <TextBlock Text="{Binding Logs_Title}"
                     Foreground="White"
                     FontSize="16"
                     FontWeight="Bold"
@@ -294,8 +297,7 @@
                             FontWeight="Bold"
                             VerticalAlignment="Center"/>
 
-                        <Button Content="🧹 Clear History"
-                            Click="ClearHistory_Click"
+                        <Button Click="ClearHistory_Click"
                             Margin="20,0,0,0"
                             Background="#3a3a3a"
                             Foreground="White"
@@ -303,7 +305,13 @@
                             FontSize="13"
                             BorderThickness="0"
                             Cursor="Hand"
-                            HorizontalAlignment="Right"/>
+                            HorizontalAlignment="Right">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🧹" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding History_Clear}"/>
+                            </StackPanel>
+                        </Button>
+
                     </StackPanel>
 
                     <ItemsControl x:Name="HistoryList">
@@ -352,7 +360,7 @@
               VerticalScrollBarVisibility="Auto">
 
                 <StackPanel Margin="10" Orientation="Vertical">
-                    <TextBlock Text="Changelog"
+                    <TextBlock Text="{Binding Changelog_Title}"
                    Foreground="White"
                    FontSize="16"
                    FontWeight="Bold"
@@ -426,14 +434,15 @@
 
                 <StackPanel Margin="10" Orientation="Vertical" VerticalAlignment="Top" >
                     <!-- Title -->
-                    <TextBlock Text="Settings Page"
+                    <TextBlock Text="{Binding Settings_Title}"
                         Foreground="White"
                         FontSize="16"
                         FontWeight="Bold"
                         Margin="0,0,0,20"/>
 
+                    <!-- Uncategorized Buttons -->
                     <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Auto-connect on launch"
+                        <TextBlock Text="{Binding Settings_Auto_Connect}"
                             VerticalAlignment="Center"
                             Margin="0,0,10,0"
                             Foreground="White"
@@ -445,7 +454,7 @@
                     </StackPanel>
 
                     <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Block Explicit Songs"
+                        <TextBlock Text="{Binding Settings_Block_Explicit}"
                             VerticalAlignment="Center"
                             Margin="0,0,10,0"
                             Foreground="White"
@@ -458,7 +467,7 @@
 
                     <!-- Twitch Section -->
                     <ToggleButton x:Name="TwitchSectionToggle"
-                        Content="Twitch Bot Settings"
+                        Content="{Binding Settings_Category_Twitch}"
                         Style="{StaticResource SectionToggleButtonStyle}"
                         IsChecked="False"
                         Checked="TwitchSectionToggle_Checked"
@@ -470,7 +479,7 @@
                         Margin="10,0,0,10">
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Bot Username" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Bot_Username}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="UsernameField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -482,7 +491,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Bot OAuth" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Bot_OAuth}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="OAuthField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -493,7 +502,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Channel" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Channel}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="ChannelField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -507,7 +516,7 @@
 
                     <!-- Spotify Section -->
                     <ToggleButton x:Name="SpotifySectionToggle"
-                        Content="Spotify Client Settings"
+                        Content="{Binding Settings_Category_Spotify}"
                         Style="{StaticResource SectionToggleButtonStyle}"
                         IsChecked="False"
                         Checked="SpotifySectionToggle_Checked"
@@ -519,7 +528,7 @@
                         Margin="10,0,0,10">
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Spotify Client ID" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Spotify_ID}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="ClientIDField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -530,7 +539,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Spotify Client Secret" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Spotify_Secret}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="ClientSecretField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -541,9 +550,9 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Twitch Section -->
+                    <!-- Commands Section -->
                     <ToggleButton x:Name="CommandsSectionToggle"
-                        Content="Command Settings"
+                        Content="{Binding Settings_Category_Commands}"
                         Style="{StaticResource SectionToggleButtonStyle}"
                         IsChecked="False"
                         Checked="CommandsSectionToggle_Checked"
@@ -555,7 +564,7 @@
                         Margin="10,0,0,10">
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Prefix" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Prefix}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="CmdPrefixField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -566,7 +575,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Queue Song" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Queue}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="QueueCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -577,7 +586,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Blacklist Song / Artist" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Blacklist}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="BlacklistCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -588,7 +597,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Unblacklist Song / Artist" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Unblacklist}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="UnblacklistCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -599,7 +608,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Ban User" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Ban}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="BanUserCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -610,7 +619,7 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Unban User" Foreground="White" FontSize="13"/>
+                            <TextBlock Text="{Binding Settings_Command_Unban}" Foreground="White" FontSize="13"/>
                             <TextBox x:Name="UnbanUserCmdField"
                                 Background="#1e1e1e"
                                 Foreground="White"
@@ -622,7 +631,7 @@
                     </StackPanel>
 
                     <!-- Save Button -->
-                    <Button Content="Save Settings"
+                    <Button Content="{Binding Settings_Save}"
                         Click="SaveSettings_Click"
                         Background="#3a3a3a"
                         Foreground="White"
@@ -643,18 +652,23 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Bottom-left: connection status -->
-                <TextBlock x:Name="ConnectionStatusText"
-                    Text="● Not Connected"
-                    FontSize="12"
+                <TextBlock FontSize="12"
+                    Name="ConnectionStatusText"
                     Foreground="Red"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Margin="10,5,0,5"
-                    Grid.Column="0"/>
+                    Grid.Column="0">
+                    <TextBlock.Inlines>
+                        <Run Text="● " />
+                        <Run Text="{Binding ConnectionStatusDynamic}" />
+                    </TextBlock.Inlines>
+                </TextBlock>
+
 
                 <!-- Bottom-right: Connect button -->
                 <Button x:Name="ConnectButton"
-                    Content="Connect"
+                    Content="{Binding Settings_Save}"
                     Click="ConnectButton_Click"
                     Background="#3a3a3a"
                     Foreground="White"

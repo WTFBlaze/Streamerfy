@@ -10,6 +10,11 @@
 
         public static void InitializeServices()
         {
+            Task.Run(async () =>
+            {
+                await LanguageService.InitializeAsync();
+            });
+
             Blacklist = new BlacklistService();
             NowPlaying = new NowPlayingService();
             Playback = new PlaybackHistoryService();

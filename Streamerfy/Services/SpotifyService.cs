@@ -98,7 +98,7 @@ namespace Streamerfy.Services
                 }
                 catch (Exception ex)
                 {
-                    MainWindow.Instance.AddLog($"⚠️ Polling error: {ex.Message}", Colors.OrangeRed);
+                    MainWindow.Instance.AddLog(LanguageService.Translate("Message_Polling_Error", new { ERROR = ex.Message }), Colors.OrangeRed);
                 }
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5)); // poll every 5s
         }
@@ -107,7 +107,7 @@ namespace Streamerfy.Services
         #region Event Methods
         private async Task OnErrorReceived(object sender, string error, string? state)
         {
-            MainWindow.Instance.AddLog($"⚠️ Spotify Authorization Error: {error}.", Colors.OrangeRed);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Failure", new { ERROR = error }), Colors.OrangeRed);
             await _server.Stop();
         }
 
@@ -122,7 +122,7 @@ namespace Streamerfy.Services
 
             _client = new SpotifyClient(token);
 
-            MainWindow.Instance.AddLog("✅ Spotify Authorized!", Colors.LimeGreen);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Success"), Colors.LimeGreen);
             StartPolling();
         }
 
@@ -138,7 +138,7 @@ namespace Streamerfy.Services
                 ? name
                 : "Spotify (Autoplay/Shuffle)";
 
-            MainWindow.Instance.AddLog($"🎵 Now Playing {trackName} - {artistName} (Requested by {requestedBy})", Colors.CornflowerBlue);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_NowPlaying", new { SONG = trackName, ARTIST = artistName, REQUESTER = requestedBy }), Colors.CornflowerBlue);
             _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
             _playbackHistory.Add(new SpotifyTrack
             {
@@ -166,10 +166,10 @@ namespace Streamerfy.Services
             string artistName = track.Artists.FirstOrDefault()?.Name ?? "Unknown";
             string coverUrl = track.Album.Images.FirstOrDefault()?.Url ?? "";
 
-            string statusText = isPlaying ? "▶️ Resumed" : "⏸️ Paused";
+            string statusText = LanguageService.Translate(isPlaying ? "Message_Song_Resumed" : "Message_Song_Paused");
             var color = isPlaying ? Colors.LightGreen : Colors.Orange;
 
-            MainWindow.Instance.AddLog($"{statusText} {trackName} - {artistName}", color);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Playback_Notice", new { STATE = statusText, SONG = trackName, ARTIST = artistName }), color);
             _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
         }
         #endregion

@@ -25,7 +25,7 @@ namespace Streamerfy.Services
             }
             catch (Exception ex)
             {
-                MainWindow.Instance?.AddLog($"❌ Failed to write NowPlaying.json: {ex.Message}", System.Windows.Media.Colors.Red);
+                MainWindow.Instance?.AddLog(LanguageService.Translate("Message_NowPlaying_Failure", new { ERROR = ex.Message }), System.Windows.Media.Colors.Red);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Streamerfy.Services
             }
             catch (Exception ex)
             {
-                MainWindow.Instance?.AddLog($"❌ Failed to clear NowPlaying.json: {ex.Message}", System.Windows.Media.Colors.Red);
+                MainWindow.Instance?.AddLog(LanguageService.Translate("Message_NowPlaying_Clear_Failure", new { ERROR = ex.Message }), System.Windows.Media.Colors.Red);
             }
         }
     }

@@ -33,7 +33,7 @@ namespace Streamerfy.Windows
             // Apply Current Log Settings to Fields
             ApplySettingsToUI();
 
-            AddLog("✅ Streamerfy ready for use!", Colors.LimeGreen);
+            AddLog(LanguageService.Translate("Message_Ready"), Colors.LimeGreen);
         }
 
         #region Window Events Logic
@@ -61,11 +61,6 @@ namespace Streamerfy.Windows
             {
                 ServiceManager.Twitch.SetChannel(App.Settings.Channel);
                 ServiceManager.Twitch.Connect();
-
-                // Update UI, e.g.:
-                ConnectionStatusText.Text = "● Connected";
-                ConnectionStatusText.Foreground = new SolidColorBrush(Colors.LimeGreen);
-                SetConnectButtonContent(false);
             }
         }
 
@@ -137,7 +132,7 @@ namespace Streamerfy.Windows
         {
             var (updateAvailable, latest) = await VersionService.CheckForUpdatesAsync();
             if (updateAvailable)
-                MainWindow.Instance.AddLog($"🔔 A new version of Streamerfy ({latest}) is available (You're on {VersionService.CurrentVersion})! Download at https://github.com/WTFBlaze/Streamerfy/releases", Colors.Yellow);
+                MainWindow.Instance.AddLog(LanguageService.Translate("Message_Update_Available", new { LATEST_VERSION = latest, CURRENT_VERSION = VersionService.CurrentVersion }), Colors.Yellow);
         }
         #endregion
 
@@ -178,7 +173,7 @@ namespace Streamerfy.Windows
                 Task.Run(async () =>
                 {
                     await ServiceManager.Spotify.AddToQueue($"https://open.spotify.com/track/{entry.TrackId}", "Streamer");
-                    AddLog($"🔁 Re-added {entry.TrackName} by {entry.ArtistName} to queue.", Colors.LightGreen);
+                    AddLog(LanguageService.Translate("Message_ReQueued", new { SONG = entry.TrackName, ARTIST = entry.ArtistName }), Colors.LightGreen);
                 });
             }
         }
@@ -187,10 +182,10 @@ namespace Streamerfy.Windows
         {
             if (sender is Button button && button.DataContext is PlaybackEntry entry)
             {
-                if (ShowConfirmation($"Are you sure you want to blacklist this track?\n\n{entry.TrackName} by {entry.ArtistName}"))
+                if (ShowConfirmation(LanguageService.Translate("Message_Blacklist_Track_Confirmation", new { SONG = entry.TrackName, ARTIST = entry.ArtistName })))
                 {
                     ServiceManager.Blacklist.AddTrack(entry.TrackId);
-                    AddLog($"🚫 Blacklisted track: {entry.TrackName}", Colors.OrangeRed);
+                    AddLog(LanguageService.Translate("Message_Blacklist_Track_Success", new { SONG = entry.TrackName, ARTIST = entry.ArtistName, REQUESTER = "Streamer"}), Colors.OrangeRed);
                 }
             }
         }
@@ -199,10 +194,10 @@ namespace Streamerfy.Windows
         {
             if (sender is Button button && button.DataContext is PlaybackEntry entry)
             {
-                if (ShowConfirmation($"Are you sure you want to blacklist this artist?\n\n{entry.ArtistName}"))
+                if (ShowConfirmation(LanguageService.Translate("Message_Blacklist_Artist_Confirmation", new { ARTIST = entry.ArtistName })))
                 {
                     ServiceManager.Blacklist.AddArtist(entry.ArtistId);
-                    AddLog($"🧑‍🎤🚫 Blacklisted artist: {entry.ArtistName}", Colors.OrangeRed);
+                    AddLog(LanguageService.Translate("Message_Blacklist_Artist_Success", new { ARTIST = entry.ArtistName, REQUESTER = "Streamer" }), Colors.OrangeRed);
                 }
             }
         }
@@ -214,27 +209,27 @@ namespace Streamerfy.Windows
                 #region Idiot Proofing lol
                 if (entry.RequestedBy == "Unknown")
                 {
-                    ShowInfo("Unknown user to ban!");
+                    ShowInfo(LanguageService.Translate("Message_Ban_Unknown"));
                     return;
                 }
 
                 if (entry.RequestedBy == "Spotify (Autoplay/Shuffle)")
                 {
-                    ShowInfo("You cannot ban Spotify!");
+                    ShowInfo(LanguageService.Translate("Message_Ban_Spotify"));
                     return;
                 }
 
                 if (entry.RequestedBy == "Streamer")
                 {
-                    ShowInfo("You cannot ban yourself!");
+                    ShowInfo(LanguageService.Translate("Message_Chat_Ban_Streamer"));
                     return;
                 }
                 #endregion
 
-                if (ShowConfirmation($"Are you sure you want to blacklist this artist?\n\n{entry.ArtistName}"))
+                if (ShowConfirmation(LanguageService.Translate("Message_Ban_User_Confirmation", new { })))
                 {
                     ServiceManager.Blacklist.AddUser(entry.RequestedBy);
-                    AddLog($"🔨 Banned requester: {entry.RequestedBy}", Colors.OrangeRed);
+                    AddLog(LanguageService.Translate("Message_Ban_Success", new { TARGET = entry.RequestedBy, REQUESTER = "Streamer" }), Colors.OrangeRed);
                 }
             }
         }
@@ -367,20 +362,16 @@ namespace Streamerfy.Windows
             if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => SetConnectionStatus(channelName));
+                return;
             }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(channelName))
-                {
-                    ConnectionStatusText.Text = $"● Connected to {channelName}";
-                    ConnectionStatusText.Foreground = new SolidColorBrush(Colors.LimeGreen);
-                }
-                else
-                {
-                    ConnectionStatusText.Text = $"● Not Connected";
-                    ConnectionStatusText.Foreground = new SolidColorBrush(Colors.Red);
-                }
-            }
+
+            LanguageService.ViewModel.ConnectionStatusDynamic = string.IsNullOrWhiteSpace(channelName)
+                ? LanguageService.Translate("ConnectionStatus_Disconnected")
+                : LanguageService.Translate("ConnectionStatus_Connected", new { CHANNEL = channelName });
+
+            ConnectionStatusText.Foreground = string.IsNullOrWhiteSpace(channelName)
+                ? new SolidColorBrush(Colors.Red)
+                : new SolidColorBrush(Colors.LimeGreen);
         }
 
         public void SetConnectButtonContent(bool state)

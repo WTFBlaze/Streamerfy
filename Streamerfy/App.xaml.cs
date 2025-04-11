@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Streamerfy.Data.Internal.Json;
 using Streamerfy.Services;
+using Streamerfy.Utils;
 using System.Configuration;
 using System.Data;
 using System.IO;
@@ -19,7 +20,9 @@ namespace Streamerfy
         public static string RoamingFolder { get; private set; }
         public static string SettingsFile { get; private set; }
         public static string PlaybackFile { get; private set; }
-        
+
+        public static string LanguagesFolder { get; private set; }
+
         public static string BlacklistFolder { get; private set; }
         public static string SongBlacklistFile { get; private set; }
         public static string ArtistBlacklistFile { get; private set; }
@@ -33,6 +36,7 @@ namespace Streamerfy
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            DebugConsole.Init();
             if (!SetupRoamingFiles() || !SetupAppSettings()) return;
             EnsureNowPlayingHtmlExists();
             ServiceManager.InitializeServices();
@@ -54,6 +58,7 @@ namespace Streamerfy
                 RoamingFolder = EnsureDirectoryExistance(appDataPath, "Streamerfy");
                 BlacklistFolder = EnsureDirectoryExistance(RoamingFolder, "Blacklist");
                 NowPlayingFolder = EnsureDirectoryExistance(RoamingFolder, "NowPlaying");
+                LanguagesFolder = EnsureDirectoryExistance(RoamingFolder, "Languages");
 
                 // Ensure Files
                 SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json");

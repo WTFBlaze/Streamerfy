@@ -117,11 +117,11 @@ namespace Streamerfy.Services
                 try
                 {
                     Global = await FetchGlobalBlacklistAsync();
-                    MainWindow.Instance.AddLog("✅ Fetched Global Track Blacklist!", Colors.LimeGreen);
+                    MainWindow.Instance.AddLog(LanguageService.Translate("Message_Global_Blacklist_Success"), Colors.LimeGreen);
                 }
                 catch (Exception ex)
                 {
-                    MainWindow.Instance.AddLog($"⚠️ Failed to fetch Global Track Blacklist! | Err: {ex.Message}", Colors.Red);
+                    MainWindow.Instance.AddLog(LanguageService.Translate("Message_Global_Blacklist_Failure", new { ERROR = ex.Message}), Colors.Red);
                 }
             });
         }

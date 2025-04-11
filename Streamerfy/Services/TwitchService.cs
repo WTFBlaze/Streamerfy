@@ -62,7 +62,7 @@ namespace Streamerfy.Services
             }
             _customClient = null;
             MainWindow.Instance.SetConnectionStatus(string.Empty);
-            MainWindow.Instance.AddLog("🔌 Disconnected from Twitch.", Colors.OrangeRed);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Twitch_Disconnected"), Colors.OrangeRed);
             MainWindow.Instance.SetConnectButtonContent(false);
         }
 
@@ -75,7 +75,7 @@ namespace Streamerfy.Services
         private void OnConnected(object? sender, OnConnectedArgs e)
         {
             MainWindow.Instance.SetConnectionStatus(_channel);
-            MainWindow.Instance.AddLog("🔌 Connected to Twitch.", Colors.LimeGreen);
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Twitch_Connected"), Colors.LimeGreen);
             MainWindow.Instance.SetConnectButtonContent(true);
         }
 
@@ -87,7 +87,7 @@ namespace Streamerfy.Services
 
             if (_blacklist.IsUserBlacklisted(user.Username))
             {
-                Reject("You are blacklisted from using Streamerfy Commands!");
+                Reject(LanguageService.Translate("Message_Chat_UserBlacklisted"));
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace Streamerfy.Services
                     {
                         if (arg1 == null)
                         {
-                            Reject("Please provide a Spotify link.");
+                            Reject(LanguageService.Translate("Message_Chat_Missing_Link"));
                             return;
                         }
 
@@ -119,29 +119,29 @@ namespace Streamerfy.Services
                         var track = await _spotify.GetTrackInfo(url);
                         if (track == null)
                         {
-                            Reject("Could not find that track.");
-                            MainWindow.Instance.AddLog($"⚠️ Couldn't find {senderName}'s song!", Colors.OrangeRed);
+                            Reject(LanguageService.Translate("Message_Chat_Track_Not_Found"));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Track_Not_Found", new { REQUESTER = senderName }), Colors.OrangeRed);
                             return;
                         }
 
                         if (_blacklist.IsTrackBlacklisted(track.ID))
                         {
-                            Reject("That song is blacklisted!");
-                            MainWindow.Instance.AddLog($"⚠️ {senderName} tried to request a blacklist song!", Colors.OrangeRed);
+                            Reject(LanguageService.Translate("Message_Chat_Track_Blacklisted"));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Track_Blacklisted", new { REQUESTER = senderName }), Colors.OrangeRed);
                             return;
                         }
 
                         if (_blacklist.IsArtistBlacklisted(track.Artist.ID))
                         {
-                            Reject("That artist is blacklisted!");
-                            MainWindow.Instance.AddLog($"⚠️ {senderName} tried to request a blacklist artist!", Colors.OrangeRed);
+                            Reject(LanguageService.Translate("Message_Chat_Artist_Blacklisted"));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Artist_Blacklisted", new { REQUESTER = senderName }), Colors.OrangeRed);
                             return;
                         }
 
                         if (App.Settings.BlockExplicit && track.Explicit)
                         {
-                            Reject("The streamer isn't allowing explicit songs!");
-                            MainWindow.Instance.AddLog($"⚠️ {senderName} tried to request an explicit song!", Colors.OrangeRed);
+                            Reject(LanguageService.Translate("Message_Chat_No_Explict"));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_No_Explicit", new { REQUESTER = senderName }), Colors.OrangeRed);
                             return;
                         }
 
@@ -149,13 +149,13 @@ namespace Streamerfy.Services
 
                         if (!success)
                         {
-                            SendMessage("⚠️ Could not add the song to the queue (Something went wrong).");
-                            MainWindow.Instance.AddLog($"⚠️ Failed to add {senderName}'s song to queue!", Colors.OrangeRed);
+                            SendMessage(LanguageService.Translate("Message_Chat_Queue_Failure"));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Queue_Failure", new { REQUESTER = senderName }), Colors.OrangeRed);
                         }
                         else
                         {
-                            SendMessage($"✅ Queued: {track.Name} by {track.Artist.Name}");
-                            MainWindow.Instance.AddLog($"🎵 Added {track.Name} - {track.Artist.Name} (Requested by {senderName})", Colors.SkyBlue);
+                            SendMessage(LanguageService.Translate("Message_Chat_Queue_Success", new { SONG = track.Name, ARTIST = track.Artist.Name }));
+                            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Queue_Success", new { SONG = track.Name, ARTIST = track.Artist.Name, REQUESTER = senderName }), Colors.SkyBlue);
                         }
                     }
                     break;
@@ -177,17 +177,17 @@ namespace Streamerfy.Services
                                     var track = await _spotify.GetTrackInfo(arg2);
                                     if (track == null)
                                     {
-                                        Reject("Could not find track by that URL!");
+                                        Reject(LanguageService.Translate("Message_Chat_Track_Not_Found"));
                                         return;
                                     }
 
                                     if (_blacklist.IsTrackBlacklisted(track.ID))
-                                        Reject("That song is already blacklisted!");
+                                        Reject(LanguageService.Translate("Message_Blacklist_Track_Exists"));
                                     else
                                     {
                                         _blacklist.AddTrack(track.ID);
-                                        SendMessage($"✅ Added {track.Name} - {track.Artist.Name} to the blacklist.");
-                                        MainWindow.Instance.AddLog($"✅ Added {track.Name} - {track.Artist.Name} to the blacklist (Requested by {senderName})", Colors.Yellow);
+                                        SendMessage(LanguageService.Translate("Message_Chat_Blacklist_Track_Success", new { SONG = track.Name, ARTIST = track.Artist.Name }));
+                                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Blacklist_Track_Success", new { SONG = track.Name, ARTIST = track.Artist.Name, REQUESTER = senderName }), Colors.Yellow);
                                     }
                                 }
                                 break;
@@ -198,17 +198,17 @@ namespace Streamerfy.Services
                                     var artist = await _spotify.GetArtistInfo(arg2);
                                     if (artist == null)
                                     {
-                                        Reject("Could not find artist by that URL!");
+                                        Reject(LanguageService.Translate("Message_Chat_Artist_Not_Found"));
                                         return;
                                     }
 
                                     if (_blacklist.IsArtistBlacklisted(artist.ID))
-                                        Reject("That artist is already blacklisted!");
+                                        Reject(LanguageService.Translate("Message_Blacklist_Artist_Exists"));
                                     else
                                     {
                                         _blacklist.AddArtist(artist.ID);
-                                        SendMessage($"✅ Added {artist.Name} to the blacklist.");
-                                        MainWindow.Instance.AddLog($"✅ Added {artist.Name} to the blacklist (Requested by {senderName})", Colors.Yellow);
+                                        SendMessage(LanguageService.Translate("Message_Chat_Blacklist_Artist_Success", new { ARTIST = artist.Name }));
+                                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Blacklist_Artist_Success", new { ARTIST = artist.Name, REQUESTER = senderName }), Colors.Yellow);
                                     }
 
                                 }
@@ -222,7 +222,7 @@ namespace Streamerfy.Services
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null || arg2 == null)
                         {
-                            Reject("Usage: !unblacklist [track|artist] [url]");
+                            Reject(LanguageService.Translate("Message_Unblacklist_Usage"));
                             return;
                         }
 
@@ -234,17 +234,17 @@ namespace Streamerfy.Services
                                     var track = await _spotify.GetTrackInfo(arg2);
                                     if (track == null)
                                     {
-                                        Reject("Could not find track by that URL!");
+                                        Reject(LanguageService.Translate("Message_Chat_Track_Not_Found"));
                                         return;
                                     }
 
                                     if (!_blacklist.IsTrackBlacklisted(track.ID))
-                                        Reject("That song is not blacklisted!");
+                                        Reject(LanguageService.Translate("Message_Unblacklist_Track_Not_Found"));
                                     else
                                     {
                                         _blacklist.RemoveTrack(track.ID);
-                                        SendMessage($"✅ Removed {track.Name} - {track.Artist.Name} from the blacklist.");
-                                        MainWindow.Instance.AddLog($"✅ Removed {track.Name} - {track.Artist.Name} from the blacklist (Requested by {senderName})", Colors.YellowGreen);
+                                        SendMessage(LanguageService.Translate("Message_Chat_Unblacklist_Track_Success", new { SONG = track.Name, ARTIST = track.Artist.Name }));
+                                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Unblacklist_Track_Success", new { SONG = track.Name, ARTIST = track.Artist.Name, REQUESTER = senderName }), Colors.YellowGreen);
                                     }
                                 }
                                 break;
@@ -255,17 +255,17 @@ namespace Streamerfy.Services
                                     var artist = await _spotify.GetArtistInfo(arg2);
                                     if (artist == null)
                                     {
-                                        Reject("Could not find artist by that URL!");
+                                        Reject(LanguageService.Translate("Message_Chat_Artist_Not_Found"));
                                         return;
                                     }
 
                                     if (!_blacklist.IsArtistBlacklisted(artist.ID))
-                                        Reject("That artist is not blacklisted!");
+                                        Reject(LanguageService.Translate("Message_Unblacklist_Artist_Not_Found"));
                                     else
                                     {
                                         _blacklist.RemoveArtist(artist.ID);
-                                        SendMessage($"✅ Removed {artist.Name} from the blacklist.");
-                                        MainWindow.Instance.AddLog($"✅ Removed {artist.Name} from the blacklist (Requested by {senderName})", Colors.YellowGreen);
+                                        SendMessage(LanguageService.Translate("Message_Chat_Unblacklist_Artist_Success", new { ARTIST = artist.Name }));
+                                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Unblacklist_Artist_Success", new { ARTIST = artist.Name, REQUESTER = senderName }), Colors.YellowGreen);
                                     }
 
                                 }
@@ -280,25 +280,25 @@ namespace Streamerfy.Services
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null)
                         {
-                            Reject("Usage: !rban [username]");
+                            Reject(LanguageService.Translate("Message_Ban_Usage"));
                             return;
                         }
 
                         if (arg1.ToLower().Equals(_client.JoinedChannels[0].Channel.ToLower()))
                         {
-                            Reject("You cannot blacklist the streamer!");
+                            Reject(LanguageService.Translate("Message_Chat_Ban_Streamer"));
                             return;
                         }
 
                         if (_blacklist.IsUserBlacklisted(arg1.ToLower()))
                         {
-                            Reject($"{arg1} is already blacklisted!");
+                            Reject(LanguageService.Translate("Message_Chat_Ban_Exists", new { TARGET = arg1 }));
                             return;
                         }
 
                         _blacklist.AddUser(arg1.ToLower());
-                        MainWindow.Instance.AddLog($"✅ Blacklisted {arg1} from using Streamerfy commands (Requested by {senderName})", Colors.Orange);
-                        SendMessage($"✅ Blacklisted {arg1} from using Streamerfy commands.");
+                        SendMessage(LanguageService.Translate("Message_Chat_Ban_Success", new { TARGET = arg1 }));
+                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Ban_Success", new { TARGET = arg1, REQUESTER = senderName }), Colors.Orange);
                     }
                     break;
 
@@ -307,19 +307,19 @@ namespace Streamerfy.Services
                         if (!user.IsModerator && !user.IsBroadcaster) return;
                         if (arg1 == null)
                         {
-                            Reject("Usage: !runban [username]");
+                            Reject(LanguageService.Translate("Message_Unban_Usage"));
                             return;
                         }
 
                         if (!_blacklist.IsUserBlacklisted(arg1.ToLower()))
                         {
-                            Reject($"{arg1} is not blacklisted!");
+                            Reject(LanguageService.Translate("Message_Chat_Unban_Not_Found", new { TARGET = arg1 }));
                             return;
                         }
 
                         _blacklist.RemoveUser(arg1.ToLower());
-                        MainWindow.Instance.AddLog($"✅ Unblacklisted {arg1} from using Streamerfy commands (Requested by {senderName})", Colors.Orange);
-                        SendMessage($"✅ Unblacklisted {arg1} from using Streamerfy commands.");
+                        SendMessage(LanguageService.Translate("Message_Chat_Unban_Success", new { TARGET = arg1 }));
+                        MainWindow.Instance.AddLog(LanguageService.Translate("Message_Unban_Success", new { TARGET = arg1, REQUESTER = senderName }), Colors.Orange);
                     }
                     break;
             }
