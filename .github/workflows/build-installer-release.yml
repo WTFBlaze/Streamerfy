@@ -5,7 +5,6 @@ on:
 
 jobs:
   build-and-release:
-    name: 🔧 Build & Create Installer
     runs-on: windows-latest
     permissions:
       contents: write
@@ -19,38 +18,19 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: 🧱 Restore dependencies
-        run: dotnet restore Streamerfy/Streamerfy/Streamerfy.csproj
-      
-      - name: 📦 Publish Streamerfy (Framework-Dependent)
+      - name: 📦 Restore & Publish (Framework-Dependent)
         run: |
-          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
-            --self-contained false `
-            /p:PublishSingleFile=false `
-            /p:IncludeNativeLibrariesForSelfExtract=true `
-            /p:EnableCompressionInSingleFile=true `
-            /p:IncludeAllContentForSelfExtract=true `
-            /p:StripDebugSymbols=true
-
-      - name: 📁 Copy published files to InstallerPayload
-        run: |
-          mkdir Streamerfy/Streamerfy/InstallerPayload
-          Copy-Item -Path Streamerfy/Streamerfy/bin/Release/net6.0-windows/win-x64/publish/* -Destination Streamerfy/Streamerfy/InstallerPayload -Recurse -Force
-
-      - name: 🧾 Check Installer Script Contents
-        run: |
-          echo "Installer folder contents:"
-          dir Streamerfy/Streamerfy/installer
+          dotnet restore Streamerfy/Streamerfy.csproj
+          dotnet publish Streamerfy/Streamerfy.csproj -c Release -f net6.0-windows -r win-x64 --self-contained false -o InstallerPayload
 
       - name: 🧰 Setup Inno Setup
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
         with:
-          path: Streamerfy/Streamerfy/installer/Streamerfy.iss
+          path: installer/Streamerfy.iss
 
-      - name: 🚀 Create GitHub Release
+      - name: 📤 Upload Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
           name: "Streamerfy Installer v${{ github.run_number }}"
-          files: |
-            Streamerfy/Streamerfy/Output/StreamerfyInstaller.exe
+          files: Output/StreamerfyInstaller.exe
