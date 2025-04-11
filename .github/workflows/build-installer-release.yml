@@ -42,26 +42,11 @@ jobs:
             Write-Error "❌ Could not extract version from $versionFile"
             exit 1
           }
-          
-      - name: 🧪 Show contents of InstallerPayload
-        run: dir installer/InstallerPayload
-
-      - name: 🔍 Confirm Icon Exists
-        run: |
-          if (-Not (Test-Path "installer/Streamerfy.ico")) {
-            Write-Error "❌ Streamerfy.ico not found!"
-            exit 1
-          }
-        shell: pwsh
       
       - name: 🛠 Compile Installer (Inno Setup)
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\Streamerfy.iss
         shell: pwsh
-        working-directory: Streamerfy
-
-      - name: 📦 Show Output Directory
-        run: dir installer/Output
 
       - name: 🚀 Upload Installer to GitHub Release
         uses: softprops/action-gh-release@v1
