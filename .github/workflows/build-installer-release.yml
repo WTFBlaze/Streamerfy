@@ -30,8 +30,10 @@ jobs:
       - name: 🧪 Show contents of InstallerPayload
         run: dir installer/InstallerPayload
 
-      - name: 🏗 Compile Installer (Inno Setup)
-        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\Streamerfy.iss'
+      - name: 🛠 Compile Installer (Inno Setup)
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\Streamerfy.iss
+        shell: pwsh
 
       - name: 📦 Show Output Directory
         run: dir installer/Output
