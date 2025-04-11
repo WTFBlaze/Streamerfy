@@ -22,28 +22,30 @@ jobs:
       - name: 🧱 Restore dependencies
         run: dotnet restore Streamerfy/Streamerfy.csproj
 
-      - name: 📦 Publish Streamerfy (Framework-Dependent)
-        shell: cmd
-        run: |
-          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 ^
-            --self-contained false ^
-            /p:PublishSingleFile=false ^
-            /p:IncludeNativeLibrariesForSelfExtract=true ^
-            /p:EnableCompressionInSingleFile=true ^
-            /p:IncludeAllContentForSelfExtract=true ^
-            /p:StripDebugSymbols=true
+      - name: 🛠️ Publish Streamerfy (Framework-Dependent)
+        run: >
+          dotnet publish Streamerfy/Streamerfy.csproj
+          -f net6.0-windows
+          -c Release
+          -r win-x64
+          --self-contained false
+          /p:PublishSingleFile=false
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
+          /p:IncludeAllContentForSelfExtract=true
+          /p:StripDebugSymbols=true
 
-      - name: 📁 Copy published files to installer folder
+      - name: 📁 Prepare installer payload
         run: |
           New-Item -ItemType Directory -Force -Path InstallerPayload
           Copy-Item -Path Streamerfy\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
 
-      - name: 📦 Create Installer (Inno Setup)
+      - name: 🧩 Run Inno Setup to build installer
         uses: crazy-max/ghaction-inno-setup@v3
         with:
           path: installer/Streamerfy.iss
 
-      - name: 🚀 Create GitHub Release
+      - name: 🚀 Publish GitHub Release with Installer
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
