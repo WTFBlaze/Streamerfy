@@ -7,8 +7,6 @@ OutputDir=Output
 OutputBaseFilename=StreamerfyInstaller
 Compression=lzma
 SolidCompression=yes
-SetupIconFile=installer\Streamerfy.ico
-UninstallDisplayIcon={app}\Streamerfy.exe
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
