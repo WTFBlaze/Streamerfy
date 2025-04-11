@@ -9,47 +9,47 @@ jobs:
     permissions:
       contents: write
 
+    defaults:
+      run:
+        working-directory: Streamerfy
+
     steps:
-      - name: ⬇️ Checkout code
+      - name: ⬇️ Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🛠️ Setup .NET
+      - name: 🛠 Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
 
-      - name: 📦 Publish Streamerfy (Framework-Dependent)
-        working-directory: Streamerfy
-        run: |
-          dotnet publish Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
-            /p:PublishSingleFile=false `
-            /p:IncludeNativeLibrariesForSelfExtract=true `
-            /p:EnableCompressionInSingleFile=true `
-            /p:IncludeAllContentForSelfExtract=true `
-            /p:StripDebugSymbols=true
-      
-      - name: 📁 Prepare InstallerPayload folder
-        working-directory: Streamerfy
+      - name: 🧱 Restore Dependencies
+        run: dotnet restore Streamerfy.csproj
+
+      - name: 📦 Build (Framework-Dependent)
+        run: dotnet publish Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 --self-contained false /p:PublishSingleFile=false
+
+      - name: 📁 Copy Files to InstallerPayload
         run: |
           New-Item -ItemType Directory -Force -Path installer/InstallerPayload
-          Copy-Item -Path bin/Release/net6.0-windows/win-x64/publish/* `
-            -Destination installer/InstallerPayload -Recurse -Force
+          Copy-Item -Path bin\Release\net6.0-windows\win-x64\publish\* -Destination installer/InstallerPayload -Recurse -Force
 
+      - name: 🧪 Show Files Before Inno Setup
+        run: dir installer/InstallerPayload
 
-      - name: 🧰 Setup Inno Setup
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
+      - name: 🧪 Show .iss File Exists
+        run: dir installer
+
+      - name: 🏗 Create Installer via Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2
         with:
           path: installer/Streamerfy.iss
 
-      - name: 📂 Debug - List Installer Output
-        run: |
-          echo "Listing contents of Streamerfy/installer/Output"
-          dir Streamerfy/installer/Output
+      - name: 📂 Show Output Files
+        run: dir installer/Output
 
-      - name: 🚀 Create GitHub Release
+      - name: 🚀 Upload Installer to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
           name: "Streamerfy Installer v${{ github.run_number }}"
-          files: |
-            Streamerfy/installer/Output/StreamerfyInstaller.exe
+          files: Streamerfy/installer/Output/StreamerfyInstaller.exe
