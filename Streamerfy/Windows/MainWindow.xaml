@@ -193,6 +193,82 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- Dark Combo Box Style -->
+        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#1e1e1e"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton"
+                                Grid.Column="2"
+                                Focusable="false"
+                                IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                ClickMode="Press"
+                                Background="#1e1e1e"
+                                BorderBrush="#444"
+                                BorderThickness="1"
+                                Foreground="White">
+                                <Grid>
+                                    <Path x:Name="Arrow"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Data="M 0 0 L 4 4 L 8 0 Z"
+                                        Fill="White"/>
+                                </Grid>
+                            </ToggleButton>
+                            <ContentPresenter Name="ContentSite"
+                                IsHitTestVisible="False"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                Margin="6,2,25,2"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"/>
+                            <Popup Name="Popup"
+                                Placement="Bottom"
+                                IsOpen="{TemplateBinding IsDropDownOpen}"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                PopupAnimation="Slide">
+                                <Grid Name="DropDown"
+                                    SnapsToDevicePixels="True"
+                                    MinWidth="{TemplateBinding ActualWidth}"
+                                    MaxHeight="200"
+                                    Background="#1e1e1e">
+                                    <ScrollViewer Margin="4,6,4,6"
+                                        SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True"
+                                            KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDown" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" Value="#555"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" Value="#007acc"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="#1e1e1e" CornerRadius="10" BorderBrush="#444" BorderThickness="1" ClipToBounds="True">
@@ -470,7 +546,23 @@
                         FontWeight="Bold"
                         Margin="0,0,0,20"/>
 
-                    <!-- Uncategorized Buttons -->
+                    <!-- Uncategorized Items -->
+                    <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Settings_Language}"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0"
+                            Foreground="White"
+                            FontSize="13"/>
+
+                        <ComboBox x:Name="LanguageSelector"
+                            Style="{StaticResource DarkComboBoxStyle}"
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Left"
+                            SelectionChanged="LanguageSelector_SelectionChanged"/>
+                    </StackPanel>
+
+
+
                     <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Settings_Auto_Connect}"
                             VerticalAlignment="Center"

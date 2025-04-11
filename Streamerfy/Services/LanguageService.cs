@@ -20,8 +20,15 @@ namespace Streamerfy.Services
 
         public static async Task InitializeAsync()
         {
-            Console.WriteLine("[INFO] Initializing LanguageService...");
-            IsInitialized = false;
+            if (IsInitialized)
+            {
+                IsInitialized = false;
+                Console.WriteLine("[INFO] Re-initializing LanguageService...");
+            }
+            else
+            {
+                Console.WriteLine("[INFO] Initializing LanguageService...");
+            }
 
             string lang = App.Settings.Language ?? "en";
             string path = Path.Combine(App.LanguagesFolder, $"{lang}.json");
@@ -64,6 +71,38 @@ namespace Streamerfy.Services
             Console.WriteLine("[SUCCESS] LanguageService initialized.");
             IsInitialized = true;
         }
+
+        public static async Task<List<string>> FetchAvailableLanguagesAsync()
+        {
+            try
+            {
+                using var http = new HttpClient();
+                http.DefaultRequestHeaders.UserAgent.ParseAdd("Streamerfy");
+
+                var url = "https://api.github.com/repos/WTFBlaze/Streamerfy/contents/Languages";
+                var response = await http.GetStringAsync(url);
+
+                var files = JsonDocument.Parse(response).RootElement;
+                var langs = new List<string>();
+
+                foreach (var file in files.EnumerateArray())
+                {
+                    var name = file.GetProperty("name").GetString();
+                    if (name != null && name.EndsWith(".json"))
+                    {
+                        langs.Add(Path.GetFileNameWithoutExtension(name));
+                    }
+                }
+
+                return langs;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[ERROR] Failed to fetch language list: " + ex.Message);
+                return new List<string> { "en" };
+            }
+        }
+
 
         private static async Task<bool> IsLanguageFileUpToDate(string lang, string localPath)
         {

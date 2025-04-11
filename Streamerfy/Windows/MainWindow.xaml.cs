@@ -60,6 +60,7 @@ namespace Streamerfy.Windows
 
             await LanguageService.WaitUntilReadyAsync();
             FlushQueuedLogs();
+            PopulateLanguageDropdown();
 
             // Process Auto Connect
             if (AutoConnectToggle.IsChecked == true)
@@ -363,6 +364,18 @@ namespace Streamerfy.Windows
         {
             CommandsSectionPanel.Visibility = Visibility.Collapsed;
         }
+
+        private async void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LanguageSelector.SelectedItem is string selectedLang && selectedLang != App.Settings.Language)
+            {
+                App.Settings.Language = selectedLang;
+                App.SaveAppSettings();
+
+                await LanguageService.InitializeAsync();
+            }
+        }
+
         #endregion
 
         #region Misc UI Logic
@@ -413,7 +426,6 @@ namespace Streamerfy.Windows
                 LanguageService.ViewModel.ConnectButtonLabel = state
                     ? LanguageService.ViewModel.Button_Disconnect
                     : LanguageService.ViewModel.Button_Connect;
-
             }
         }
 
@@ -428,6 +440,13 @@ namespace Streamerfy.Windows
             {
                 ServiceManager.Twitch.Disconnect();
             }
+        }
+
+        private async void PopulateLanguageDropdown()
+        {
+            var langs = await LanguageService.FetchAvailableLanguagesAsync();
+            LanguageSelector.ItemsSource = langs;
+            LanguageSelector.SelectedItem = App.Settings.Language ?? "en";
         }
         #endregion
     }

@@ -132,6 +132,12 @@ namespace Streamerfy.Data.ViewModels
             set => this["Settings_Title"] = value;
         }
 
+        public string Settings_Language
+        {
+            get => this["Settings_Language"];
+            set => this["Settings_Language"] = value;
+        }
+
         public string Settings_Auto_Connect
         {
             get => this["Settings_Auto_Connect"];

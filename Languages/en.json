@@ -1,6 +1,6 @@
 {
     "language": "English",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "authors": "WTFBlaze",
 
     "Tabs_Logs": "Logs",
@@ -21,6 +21,7 @@
     "Changelog_Title": "Changelogs Page",
 
     "Settings_Title": "Settings Page",
+    "Settings_Language": "Select Language",
     "Settings_Auto_Connect": "Auto-connect on launch",
     "Settings_Block_Explicit": "Block explicit songs",
     "Settings_Category_Twitch": "Twitch Bot Settings",
