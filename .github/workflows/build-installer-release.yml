@@ -10,10 +10,6 @@ jobs:
     permissions:
       contents: write
 
-    defaults:
-      run:
-        working-directory: Streamerfy/Streamerfy
-
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
@@ -24,11 +20,11 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: 🧱 Restore dependencies
-        run: dotnet restore Streamerfy.csproj
+        run: dotnet restore Streamerfy/Streamerfy/Streamerfy.csproj
 
       - name: 📦 Publish Streamerfy (Framework-Dependent)
         run: |
-          dotnet publish Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
+          dotnet publish Streamerfy/Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
             --self-contained false `
             /p:PublishSingleFile=false `
             /p:IncludeNativeLibrariesForSelfExtract=true `
@@ -38,18 +34,18 @@ jobs:
 
       - name: 📁 Copy published files to InstallerPayload
         run: |
-          mkdir InstallerPayload
-          Copy-Item -Path .\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
+          mkdir Streamerfy/Streamerfy/InstallerPayload
+          Copy-Item -Path Streamerfy/Streamerfy/bin/Release/net6.0-windows/win-x64/publish/* -Destination Streamerfy/Streamerfy/InstallerPayload -Recurse -Force
 
       - name: 🧾 Check Installer Script Contents
         run: |
           echo "Installer folder contents:"
-          dir installer
+          dir Streamerfy/Streamerfy/installer
 
       - name: 🧰 Setup Inno Setup
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
         with:
-          path: installer/Streamerfy.iss
+          path: Streamerfy/Streamerfy/installer/Streamerfy.iss
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v1
