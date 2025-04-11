@@ -30,8 +30,9 @@ jobs:
       - name: 🧩 Inject Version into Installer Script
         shell: pwsh
         run: |
-          $versionFile = "Streamerfy/Streamerfy/Services/VersionService.cs"
-          $issFile = "installer/Streamerfy.iss"
+          $repoRoot = "${{ github.workspace }}"
+          $versionFile = Join-Path $repoRoot "Streamerfy/Streamerfy/Services/VersionService.cs"
+          $issFile = Join-Path $repoRoot "installer/Streamerfy.iss"
 
           Write-Host "🔍 Searching for version in $versionFile..."
           $versionLine = Get-Content $versionFile | Where-Object { $_ -match 'public const string CurrentVersion' }
@@ -43,10 +44,10 @@ jobs:
               exit 1
           }
 
-          # Replace the AppVersion line
+          # Replace AppVersion line in the .iss file
           (Get-Content $issFile) -replace '(?<=AppVersion=).*', $version | Set-Content $issFile
           Write-Host "📝 Updated .iss version to $version"
-
+          
       - name: 🧪 Show contents of InstallerPayload
         run: dir installer/InstallerPayload
 
