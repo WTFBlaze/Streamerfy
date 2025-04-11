@@ -1,0 +1,57 @@
+name: 📦 Build Installer and Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    name: Build Installer and Create Release
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.x'
+
+      - name: 🔨 Publish Streamerfy (not single file)
+        run: |
+          dotnet publish Streamerfy/Streamerfy.csproj ^
+            -c Release ^
+            -r win-x64 ^
+            --self-contained true ^
+            -o build_output
+
+      - name: 🧩 Setup Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2
+        with:
+          path: installer/StreamerfyInstaller.iss
+
+      - name: 🚚 Move installer to output
+        run: |
+          mkdir release
+          move installer/Output/*.exe release/
+
+      - name: 🏷 Get version
+        id: get_version
+        run: |
+          $version = (Select-String -Path Streamerfy/Services/VersionService.cs -Pattern 'CurrentVersion = "(.*?)"').Matches.Groups[1].Value
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Streamerfy v${{ steps.get_version.outputs.version }}
+          body: |
+            🚀 Streamerfy v${{ steps.get_version.outputs.version }} is now available!
+
+            To install, download and run the setup file.
+          files: |
+            release/*.exe
