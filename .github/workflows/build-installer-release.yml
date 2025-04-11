@@ -22,30 +22,35 @@ jobs:
       - name: 🧱 Restore dependencies
         run: dotnet restore Streamerfy/Streamerfy.csproj
 
-      - name: 🛠️ Publish Streamerfy (Framework-Dependent)
-        run: >
-          dotnet publish Streamerfy/Streamerfy.csproj
-          -f net6.0-windows
-          -c Release
-          -r win-x64
-          --self-contained false
-          /p:PublishSingleFile=false
-          /p:IncludeNativeLibrariesForSelfExtract=true
-          /p:EnableCompressionInSingleFile=true
-          /p:IncludeAllContentForSelfExtract=true
-          /p:StripDebugSymbols=true
+      - name: 📦 Publish Streamerfy (Framework-Dependent)
+        shell: cmd
+        run: |
+          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 ^
+            --self-contained false ^
+            /p:PublishSingleFile=false ^
+            /p:IncludeNativeLibrariesForSelfExtract=true ^
+            /p:EnableCompressionInSingleFile=true ^
+            /p:IncludeAllContentForSelfExtract=true ^
+            /p:StripDebugSymbols=true
 
-      - name: 📁 Prepare installer payload
+      - name: 📁 Copy published files to InstallerPayload
         run: |
           New-Item -ItemType Directory -Force -Path InstallerPayload
           Copy-Item -Path Streamerfy\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
 
-      - name: 🧩 Setup Inno Setup
+      - name: 🧪 Debug installer directory contents
+        run: |
+          echo "Installer folder contents:"
+          dir installer
+          echo "InstallerPayload contents:"
+          dir InstallerPayload
+
+      - name: 🧰 Create Installer using Inno Setup
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
         with:
-          path: installer/StreamerfyInstaller.iss
+          path: installer/Streamerfy.iss
 
-      - name: 🚀 Publish GitHub Release with Installer
+      - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
