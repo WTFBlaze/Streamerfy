@@ -7,7 +7,7 @@ on:
   pull_request:
     paths:
       - 'Languages/*.json'
-  workflow_dispatch: # 👈 Allows manual runs
+  workflow_dispatch: # Manual run
 
 jobs:
   validate:
@@ -16,37 +16,57 @@ jobs:
       - name: ⬇️ Check out the repository
         uses: actions/checkout@v4
 
-      - name: ✅ Validate Language Files
+      - name: 🧪 Validate Language Files
         run: |
-          echo "🔍 Checking Languages folder..."
+          echo "🔍 Validating all language files in 'Languages/'..."
+
+          failed=0
 
           for file in Languages/*.json; do
-            echo "Validating $file"
+            echo "➤ Validating: $file"
 
+            # Check if file exists and is valid JSON
+            if ! jq empty "$file" 2>/dev/null; then
+              echo "❌ $file is not valid JSON"
+              failed=1
+              continue
+            fi
+
+            # Extract and print fields
             NAME=$(jq -r '.name // empty' "$file")
             VERSION=$(jq -r '.version // empty' "$file")
             AUTHORS=$(jq -r '.authors // empty' "$file")
-            AUTHORS_TYPE=$(jq -r 'type' <<< "$AUTHORS")
+            AUTHORS_TYPE=$(jq -r '.authors | type' "$file")
+
+            echo "   → name: $NAME"
+            echo "   → version: $VERSION"
+            echo "   → authors: $AUTHORS (type: $AUTHORS_TYPE)"
 
             if [[ -z "$NAME" ]]; then
               echo "❌ $file is missing 'name'"
-              exit 1
+              failed=1
             fi
 
             if [[ -z "$VERSION" ]]; then
               echo "❌ $file is missing 'version'"
-              exit 1
+              failed=1
             fi
 
             if [[ -z "$AUTHORS" ]]; then
               echo "❌ $file is missing 'authors'"
-              exit 1
+              failed=1
+            elif [[ "$AUTHORS_TYPE" != "string" ]]; then
+              echo "❌ $file 'authors' must be a string (not $AUTHORS_TYPE)"
+              failed=1
             fi
 
-            if [[ "$AUTHORS_TYPE" != "string" ]]; then
-              echo "❌ $file 'authors' field must be a string"
-              exit 1
-            fi
-
-            echo "✅ $file passed"
+            echo "✅ Finished: $file"
+            echo
           done
+
+          if [[ $failed -ne 0 ]]; then
+            echo "❌ One or more files failed validation."
+            exit 1
+          else
+            echo "🎉 All language files passed validation!"
+          fi
