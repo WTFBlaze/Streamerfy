@@ -1,26 +1,26 @@
----
 name: 🌐 Language Submission
-title: "🌍 Language Submission"
 description: Submit a language file to be supported by Streamerfy
-labels: [language, contribution]
-assignees: WTFBlaze
+title: "[Lang] New Language Submission"
+labels: ["language", "enhancement"]
+assignees:
+  - WTFBlaze
+
 body:
   - type: input
     id: language
     attributes:
-      label: 🌐 Language
-      description: What language are you submitting a file for?
-      placeholder: e.g., German, Spanish, French
+      label: 🌍 Language Name
+      description: What language are you submitting? (e.g., French, German, Japanese)
+      placeholder: e.g., English
     validations:
       required: true
 
   - type: textarea
-    id: lang_json
+    id: file_contents
     attributes:
-      label: 📝 Language File Contents
-      description: Paste your full language file JSON here.
-      placeholder: Enter the full language JSON file...
+      label: 📄 Language File Contents
+      description: Paste the entire language JSON file content here.
+      placeholder: "{ \"version\": \"1.0.0\", \"Tabs_Logs\": \"Logs\" }"
       render: json
     validations:
       required: true
----
