@@ -7,7 +7,7 @@ on:
   pull_request:
     paths:
       - 'Languages/*.json'
-  workflow_dispatch: # Manual run
+  workflow_dispatch: # Allows manual runs
 
 jobs:
   validate:
@@ -33,17 +33,17 @@ jobs:
             fi
 
             # Extract and print fields
-            NAME=$(jq -r '.name // empty' "$file")
+            LANGUAGE=$(jq -r '.language // empty' "$file")
             VERSION=$(jq -r '.version // empty' "$file")
             AUTHORS=$(jq -r '.authors // empty' "$file")
             AUTHORS_TYPE=$(jq -r '.authors | type' "$file")
 
-            echo "   → name: $NAME"
+            echo "   → language: $LANGUAGE"
             echo "   → version: $VERSION"
             echo "   → authors: $AUTHORS (type: $AUTHORS_TYPE)"
 
-            if [[ -z "$NAME" ]]; then
-              echo "❌ $file is missing 'name'"
+            if [[ -z "$LANGUAGE" ]]; then
+              echo "❌ $file is missing 'language'"
               failed=1
             fi
 
