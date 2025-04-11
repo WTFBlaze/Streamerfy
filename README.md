@@ -15,14 +15,14 @@ Made with ❤️ for creators who want more from their music streams.
 ## ✨ Key Features
 
 - 🎧 **Spotify Playback Control** – Queue songs via Twitch chat
-- 💬 **Custom Commands** – Supports `!queue`, `!blacklist`, and more
+- 💬 **Custom Commands** – All chat commands are customizable
 - 🚫 **Blacklist Management** – Block specific songs or artists
 - 🔞 **Explicit Filter** – Toggle on/off based on your vibe
 - 🧩 **Global Blacklist** – Community-powered banned songs
 - 🎥 **OBS Now Playing Overlay** – Auto-updating HTML overlay for your stream
 - 🧼 **Local Only** – No servers, no tracking. Your data stays with you.
 - 🛠️ **One-Click Build** – Compiles to a single `.exe` (no installer required)
-
+- 🔊 **Multi-Language** - Supports language files for native language translation
 ---
 
 ## 🖼 Preview
@@ -73,12 +73,12 @@ Planned features and future improvements:
 - [x] NowPlaying.html OBS overlay
 - [x] Auto-update checker
 - [x] Playback history
+- [x] Language localizations
 - [ ] Permission roles (VIPs, Subs, Mods)
 - [ ] Command cooldowns / spam protection
 - [ ] Discord webhook integration
 - [ ] Twitch Channel Point Redeems
 - [ ] TikTok Live integration
-- [ ] Language localizations (currently English only)
 
 > Got an idea? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or leave feedback in [Discussions](https://github.com/WTFBlaze/Streamerfy/discussions)
 
