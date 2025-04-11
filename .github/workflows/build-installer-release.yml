@@ -10,6 +10,10 @@ jobs:
     permissions:
       contents: write
 
+    defaults:
+      run:
+        working-directory: Streamerfy/Streamerfy
+
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
@@ -20,33 +24,30 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: 🧱 Restore dependencies
-        run: dotnet restore Streamerfy/Streamerfy.csproj
+        run: dotnet restore Streamerfy.csproj
 
       - name: 📦 Publish Streamerfy (Framework-Dependent)
-        shell: cmd
         run: |
-          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 ^
-            --self-contained false ^
-            /p:PublishSingleFile=false ^
-            /p:IncludeNativeLibrariesForSelfExtract=true ^
-            /p:EnableCompressionInSingleFile=true ^
-            /p:IncludeAllContentForSelfExtract=true ^
+          dotnet publish Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
+            --self-contained false `
+            /p:PublishSingleFile=false `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:EnableCompressionInSingleFile=true `
+            /p:IncludeAllContentForSelfExtract=true `
             /p:StripDebugSymbols=true
 
       - name: 📁 Copy published files to InstallerPayload
         run: |
-          New-Item -ItemType Directory -Force -Path InstallerPayload
-          Copy-Item -Path Streamerfy\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
+          mkdir InstallerPayload
+          Copy-Item -Path .\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
 
-      - name: 🧪 Debug installer directory contents
+      - name: 🧾 Check Installer Script Contents
         run: |
           echo "Installer folder contents:"
           dir installer
-          echo "InstallerPayload contents:"
-          dir InstallerPayload
 
-      - name: 🧰 Create Installer using Inno Setup
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
+      - name: 🧰 Setup Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2
         with:
           path: installer/Streamerfy.iss
 
@@ -56,4 +57,4 @@ jobs:
           tag_name: v${{ github.run_number }}
           name: "Streamerfy Installer v${{ github.run_number }}"
           files: |
-            Output/StreamerfyInstaller.exe
+            Streamerfy/Streamerfy/Output/StreamerfyInstaller.exe
