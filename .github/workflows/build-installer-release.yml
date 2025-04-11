@@ -58,6 +58,7 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\Streamerfy.iss
         shell: pwsh
+        working-directory: Streamerfy
 
       - name: 📦 Show Output Directory
         run: dir installer/Output
