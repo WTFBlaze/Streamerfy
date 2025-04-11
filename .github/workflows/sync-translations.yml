@@ -1,0 +1,88 @@
+name: 🔄 Auto-Sync Translations
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Languages/en.json'
+      - 'Languages/*.json'
+
+jobs:
+  sync-translations:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🧠 Auto-sync missing translations
+        run: |
+          echo "Checking for missing keys..."
+          mkdir -p temp_sync
+          cp Languages/en.json temp_sync/en.json
+
+          MISSING_COUNT=0
+
+          for file in Languages/*.json; do
+            [ "$file" = "Languages/en.json" ] && continue
+            echo "🔍 Checking $file"
+
+            node <<EOF > temp_sync/tmp.json
+            const fs = require('fs');
+            const path = require('path');
+            
+            const ref = JSON.parse(fs.readFileSync('Languages/en.json', 'utf-8'));
+            const targetPath = '$file';
+            const target = JSON.parse(fs.readFileSync(targetPath, 'utf-8'));
+            
+            let modified = false;
+            for (const key in ref) {
+              if (!(key in target)) {
+                target[key] = "TODO: Translate";
+                modified = true;
+              }
+            }
+            
+            if (modified) {
+              fs.writeFileSync(targetPath, JSON.stringify(target, null, 2) + '\n');
+            }
+            EOF
+
+            if ! cmp -s "$file" "temp_sync/tmp.json"; then
+              echo "✅ Updated: $file"
+              cp temp_sync/tmp.json "$file"
+              MISSING_COUNT=$((MISSING_COUNT+1))
+            fi
+          done
+
+          echo "🔁 $MISSING_COUNT file(s) updated."
+
+      - name: 📤 Commit changes if needed
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -n "$(git status --porcelain Languages/)" ]; then
+            git checkout -b sync/language-updates
+            git add Languages/
+            git commit -m "🔄 Auto-synced missing translation keys"
+            git push --set-upstream origin sync/language-updates
+          else
+            echo "✅ No changes needed."
+          fi
+
+      - name: 🚀 Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 🔄 Auto-synced missing translation keys
+          branch: sync/language-updates
+          title: 🔄 Sync Missing Translation Keys
+          body: >
+            This PR was automatically generated to ensure all language files
+            contain the same keys as `en.json`. Missing keys were added with `"TODO: Translate"`.
