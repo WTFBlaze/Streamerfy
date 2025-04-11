@@ -18,16 +18,23 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: 📦 Restore & Publish (Framework-Dependent)
+      - name: 📦 Publish Streamerfy (Framework-Dependent)
+        working-directory: Streamerfy
         run: |
-          dotnet restore Streamerfy/Streamerfy.csproj
-          dotnet publish Streamerfy/Streamerfy.csproj -c Release -f net6.0-windows -r win-x64 --self-contained false -o InstallerPayload
-
+          dotnet publish Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
+            /p:PublishSingleFile=false `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:EnableCompressionInSingleFile=true `
+            /p:IncludeAllContentForSelfExtract=true `
+            /p:StripDebugSymbols=true
+      
       - name: 📁 Prepare InstallerPayload folder
+        working-directory: Streamerfy
         run: |
-          New-Item -ItemType Directory -Force -Path Streamerfy/Streamerfy/installer/InstallerPayload
-          Copy-Item -Path Streamerfy/Streamerfy/bin/Release/net6.0-windows/win-x64/publish/* `
-            -Destination Streamerfy/Streamerfy/installer/InstallerPayload -Recurse -Force
+          New-Item -ItemType Directory -Force -Path installer/InstallerPayload
+          Copy-Item -Path bin/Release/net6.0-windows/win-x64/publish/* `
+            -Destination installer/InstallerPayload -Recurse -Force
+
 
       - name: 🧰 Setup Inno Setup
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
