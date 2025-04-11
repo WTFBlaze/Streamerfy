@@ -27,6 +27,26 @@ jobs:
           New-Item -ItemType Directory -Force -Path installer/InstallerPayload
           Copy-Item -Path Streamerfy/bin/Release/net6.0-windows/win-x64/publish/* -Destination installer/InstallerPayload -Recurse -Force
 
+      - name: 🧩 Inject Version into Installer Script
+        shell: pwsh
+        run: |
+          $versionFile = "Streamerfy/Streamerfy/Services/VersionService.cs"
+          $issFile = "installer/Streamerfy.iss"
+
+          Write-Host "🔍 Searching for version in $versionFile..."
+          $versionLine = Get-Content $versionFile | Where-Object { $_ -match 'public const string CurrentVersion' }
+          if ($versionLine -match '"([^"]+)"') {
+              $version = $matches[1]
+              Write-Host "✅ Found version: $version"
+          } else {
+              Write-Error "❌ Version not found in VersionService.cs"
+              exit 1
+          }
+
+          # Replace the AppVersion line
+          (Get-Content $issFile) -replace '(?<=AppVersion=).*', $version | Set-Content $issFile
+          Write-Host "📝 Updated .iss version to $version"
+
       - name: 🧪 Show contents of InstallerPayload
         run: dir installer/InstallerPayload
 
