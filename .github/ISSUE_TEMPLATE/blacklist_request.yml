@@ -1,0 +1,41 @@
+name: 🛑 Global Track Blacklist Request
+description: Request a Spotify track to be globally blacklisted from being requested through Streamerfy.
+title: "[Blacklist] <Track Title or Reason>"
+labels: ["global blacklist", "moderation"]
+assignees:
+  - WTFBlaze
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🛑 Global Blacklist Submission
+
+        Use this form to request that a specific Spotify track be added to the global blacklist for **all Streamerfy users**.
+
+  - type: input
+    id: spotify-link
+    attributes:
+      label: 🎵 Spotify Track URL
+      description: Paste the direct link to the Spotify track you'd like blacklisted.
+      placeholder: https://open.spotify.com/track/xxxxxxxxxxxxxxxxx
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 📝 Reason for Blacklisting
+      description: Why should this track be blacklisted globally? Is it inappropriate, meme bait, TOS-breaking, etc.?
+      placeholder: This track contains graphic content and could result in DMCA strikes.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: ✅ Confirmation
+      description: Confirm that your request is made in good faith.
+      options:
+        - label: I confirm this request is serious and not made maliciously.
+          required: true
