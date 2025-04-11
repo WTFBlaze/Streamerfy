@@ -51,6 +51,6 @@ jobs:
       - name: 🚀 Upload Installer to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
+          tag_name: ${{ steps.get_version.outputs.version }}
           name: "Streamerfy Installer v${{ steps.get_version.outputs.version }}"
           files: installer/Output/StreamerfyInstaller.exe
