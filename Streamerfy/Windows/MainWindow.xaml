@@ -218,6 +218,7 @@
                                 Foreground="White">
                                 <Grid>
                                     <Path x:Name="Arrow"
+                                        Margin="115,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Data="M 0 0 L 4 4 L 8 0 Z"
@@ -531,7 +532,7 @@
             <!-- Settings Panel -->
             <ScrollViewer x:Name="SettingsPanel"
                 Grid.Row="2"
-                Visibility="Collapsed"
+                Visibility="Visible"
                 Margin="10"
                 Background="#252526"
                 VerticalScrollBarVisibility="Auto"
