@@ -48,7 +48,9 @@ jobs:
             }
 
             // Append new line
-            fs.appendFileSync(filePath, `${trackId}\n`);
+            let cleaned = existing.trim();
+            let updated = cleaned ? `${cleaned}\n${trackId}` : `${trackId}`;
+            fs.writeFileSync(filePath, `${updated}\n`);
 
             // Git commit and push
             execSync('git config user.name "github-actions[bot]"');
