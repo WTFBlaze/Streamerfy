@@ -1,38 +1,85 @@
-- name: 🧠 Extract Track ID and Append to Blacklist
-  id: process
-  uses: actions/github-script@v7
-  with:
-    script: |
-      const { readFileSync, writeFileSync, existsSync } = require('fs');
-      const { execSync } = require('child_process');
+name: 🛑 Append Approved Track to Global Blacklist
 
-      const issue = context.payload.issue;
-      const issueNumber = issue.number;
-      const issueBody = issue.body;
+on:
+  issues:
+    types: [labeled]
 
-      const match = issueBody.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/);
-      if (!match) {
-        core.setFailed("❌ No valid Spotify track link found in the issue body.");
-        return;
-      }
+jobs:
+  append-blacklist:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
 
-      const trackId = match[1];
-      const filePath = 'Data/GlobalTrackBlacklist.txt';
+    steps:
+      - name: ⬇️ Check out the repository
+        uses: actions/checkout@v4
 
-      let existing = existsSync(filePath) ? readFileSync(filePath, 'utf8') : '';
-      if (existing.includes(trackId)) {
-        console.log("⚠️ Track ID already exists in the blacklist.");
-        return;
-      }
+      - name: 🧠 Extract Track ID and Append to Blacklist
+        id: process
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { readFileSync, writeFileSync, existsSync } = require('fs');
+            const { execSync } = require('child_process');
 
-      existing += `\n${trackId}`;
-      writeFileSync(filePath, existing.trim() + '\n');
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const issueBody = issue.body;
 
-      execSync('git config user.name "github-actions[bot]"');
-      execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
-      execSync('git add ' + filePath);
-      execSync(`git commit -m "✅ Auto-added blacklisted track: ${trackId}"`);
-      execSync('git push');
+            const match = issueBody.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/);
+            if (!match) {
+              core.setFailed("❌ No valid Spotify track link found in the issue body.");
+              return;
+            }
 
-      core.setOutput('track_id', trackId);
-      core.setOutput('issue_number', issueNumber.toString());
+            const trackId = match[1];
+            const filePath = 'GlobalBlacklist.txt';
+
+            let existing = existsSync(filePath) ? readFileSync(filePath, 'utf8') : '';
+            if (existing.includes(trackId)) {
+              console.log("⚠️ Track ID already exists in the blacklist.");
+              return;
+            }
+
+            existing += `\n${trackId}`;
+            writeFileSync(filePath, existing.trim() + '\n');
+
+            execSync('git config user.name "github-actions[bot]"');
+            execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
+            execSync(`git add "${filePath}"`);
+            execSync(`git commit -m "✅ Auto-added blacklisted track: ${trackId}"`);
+            execSync('git push');
+
+            core.setOutput('track_id', trackId);
+            core.setOutput('issue_number', issueNumber);
+
+      - name: 💬 Comment on the issue
+        if: steps.process.outputs.track_id != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const trackId = core.getInput('track_id');
+            const issueNumber = core.getInput('issue_number');
+
+            await github.rest.issues.createComment({
+              issue_number: Number(issueNumber),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ The track \`${trackId}\` has been added to the global blacklist. Thanks for your submission!`
+            });
+
+      - name: 🛑 Close the issue
+        if: steps.process.outputs.track_id != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = core.getInput('issue_number');
+
+            await github.rest.issues.update({
+              issue_number: Number(issueNumber),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+            });
