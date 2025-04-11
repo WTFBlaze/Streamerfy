@@ -40,10 +40,10 @@ jobs:
           New-Item -ItemType Directory -Force -Path InstallerPayload
           Copy-Item -Path Streamerfy\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
 
-      - name: 🧩 Run Inno Setup to build installer
-        uses: crazy-max/ghaction-inno-setup@v3
+      - name: 🧩 Setup Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
         with:
-          path: installer/Streamerfy.iss
+          path: installer/StreamerfyInstaller.iss
 
       - name: 🚀 Publish GitHub Release with Installer
         uses: softprops/action-gh-release@v1
