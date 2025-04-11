@@ -27,26 +27,21 @@ jobs:
           New-Item -ItemType Directory -Force -Path installer/InstallerPayload
           Copy-Item -Path Streamerfy/bin/Release/net6.0-windows/win-x64/publish/* -Destination installer/InstallerPayload -Recurse -Force
 
-      - name: 🧩 Inject Version into Installer Script
+      - name: 🏷 Extract Version from VersionService.cs
+        id: get_version
         shell: pwsh
         run: |
-          $repoRoot = "${{ github.workspace }}"
-          $versionFile = Join-Path $repoRoot "Streamerfy/Streamerfy/Services/VersionService.cs"
-          $issFile = Join-Path $repoRoot "installer/Streamerfy.iss"
-
+          $versionFile = "Streamerfy/Services/VersionService.cs"
           Write-Host "🔍 Searching for version in $versionFile..."
           $versionLine = Get-Content $versionFile | Where-Object { $_ -match 'public const string CurrentVersion' }
           if ($versionLine -match '"([^"]+)"') {
-              $version = $matches[1]
-              Write-Host "✅ Found version: $version"
+            $version = $matches[1]
+            Write-Host "📦 Extracted version: $version"
+            echo "version=$version" >> $env:GITHUB_OUTPUT
           } else {
-              Write-Error "❌ Version not found in VersionService.cs"
-              exit 1
+            Write-Error "❌ Could not extract version from $versionFile"
+            exit 1
           }
-
-          # Replace AppVersion line in the .iss file
-          (Get-Content $issFile) -replace '(?<=AppVersion=).*', $version | Set-Content $issFile
-          Write-Host "📝 Updated .iss version to $version"
           
       - name: 🧪 Show contents of InstallerPayload
         run: dir installer/InstallerPayload
@@ -62,6 +57,6 @@ jobs:
       - name: 🚀 Upload Installer to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
-          name: "Streamerfy Installer v${{ github.run_number }}"
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: "Streamerfy Installer v${{ steps.get_version.outputs.version }}"
           files: installer/Output/StreamerfyInstaller.exe
