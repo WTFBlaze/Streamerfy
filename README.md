@@ -35,7 +35,7 @@ Made with ❤️ for creators who want more from their music streams.
 Streamerfy is — and always will be — **100% free** and **open source**.  
 No paywalls. No premium unlocks. Just good software made for streamers.
 
-> 💖 Like my work? [Buy me a Ko-fi](https://ko-fi.com/wtfblaze) to support development.
+> 💖 Like my work? [Buy me a Ko-fi](https://ko-fi.com/notblazelol) to support development.
 
 ---
 
