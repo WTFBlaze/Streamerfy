@@ -1,0 +1,46 @@
+name: 🛑 Append Approved Track to Global Blacklist
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  append-blacklist:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Extract Track ID and Append
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const issueBody = context.payload.issue.body;
+            const match = issueBody.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/);
+            if (!match) {
+              core.setFailed("No valid Spotify track link found.");
+              return;
+            }
+
+            const trackId = match[1];
+            const filePath = 'Data/GlobalTrackBlacklist.txt'; // adjust path if needed
+
+            let existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+
+            if (existing.includes(trackId)) {
+              console.log("Track ID already in blacklist.");
+              return;
+            }
+
+            existing += `\n${trackId}`;
+            fs.writeFileSync(filePath, existing.trim() + '\n');
+
+            const execSync = require('child_process').execSync;
+            execSync('git config user.name "github-actions[bot]"');
+            execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
+            execSync('git add ' + filePath);
+            execSync('git commit -m "✅ Auto-added blacklisted track: ' + trackId + '"');
+            execSync('git push');
