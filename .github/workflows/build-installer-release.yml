@@ -41,6 +41,11 @@ jobs:
         with:
           path: installer/Streamerfy.iss
 
+      - name: 📂 Debug - List Installer Output
+        run: |
+          echo "Listing contents of Streamerfy/installer/Output"
+          dir Streamerfy/installer/Output
+
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
