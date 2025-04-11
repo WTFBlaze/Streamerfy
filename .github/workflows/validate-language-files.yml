@@ -1,0 +1,57 @@
+name: ✅ Validate Language Files
+
+on:
+  push:
+    paths:
+      - 'Languages/**/*.json'
+  pull_request:
+    paths:
+      - 'Languages/**/*.json'
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🧪 Validate language files
+        run: |
+          echo "🔍 Validating language files..."
+          failed=0
+          
+          for file in Languages/*.json; do
+            echo "Checking $file..."
+
+            # Check if file is valid JSON
+            if jq empty "$file" 2>/dev/null; then
+              echo "✅ Valid JSON syntax"
+            else
+              echo "❌ $file is not valid JSON"
+              failed=1
+              continue
+            fi
+
+            # Validate required fields: name, version, authors
+            missing_keys=()
+            for key in name version authors; do
+              if ! jq -e "has(\"$key\") and (.${key} | type == \"string\")" "$file" > /dev/null; then
+                missing_keys+=("$key")
+              fi
+            done
+
+            if [ ${#missing_keys[@]} -gt 0 ]; then
+              echo "❌ $file is missing required keys: ${missing_keys[*]}"
+              failed=1
+            else
+              echo "✅ $file has all required keys"
+            fi
+          done
+
+          if [ "$failed" -ne 0 ]; then
+            echo "❗ One or more language files failed validation."
+            exit 1
+          else
+            echo "🎉 All language files are valid!"
+          fi
