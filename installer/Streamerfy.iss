@@ -1,6 +1,6 @@
 [Setup]
 AppName=Streamerfy
-AppVersion=1.0
+AppVersion=PLACEHOLDER
 DefaultDirName={autopf}\Streamerfy
 DefaultGroupName=Streamerfy
 OutputDir=Output
