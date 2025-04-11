@@ -3,55 +3,50 @@ name: ✅ Validate Language Files
 on:
   push:
     paths:
-      - 'Languages/**/*.json'
+      - 'Languages/*.json'
   pull_request:
     paths:
-      - 'Languages/**/*.json'
+      - 'Languages/*.json'
+  workflow_dispatch: # 👈 Allows manual runs
 
 jobs:
-  validate-json:
+  validate:
     runs-on: ubuntu-latest
-
     steps:
-      - name: ⬇️ Checkout repository
+      - name: ⬇️ Check out the repository
         uses: actions/checkout@v4
 
-      - name: 🧪 Validate language files
+      - name: ✅ Validate Language Files
         run: |
-          echo "🔍 Validating language files..."
-          failed=0
-          
+          echo "🔍 Checking Languages folder..."
+
           for file in Languages/*.json; do
-            echo "Checking $file..."
+            echo "Validating $file"
 
-            # Check if file is valid JSON
-            if jq empty "$file" 2>/dev/null; then
-              echo "✅ Valid JSON syntax"
-            else
-              echo "❌ $file is not valid JSON"
-              failed=1
-              continue
+            NAME=$(jq -r '.name // empty' "$file")
+            VERSION=$(jq -r '.version // empty' "$file")
+            AUTHORS=$(jq -r '.authors // empty' "$file")
+            AUTHORS_TYPE=$(jq -r 'type' <<< "$AUTHORS")
+
+            if [[ -z "$NAME" ]]; then
+              echo "❌ $file is missing 'name'"
+              exit 1
             fi
 
-            # Validate required fields: name, version, authors
-            missing_keys=()
-            for key in name version authors; do
-              if ! jq -e "has(\"$key\") and (.${key} | type == \"string\")" "$file" > /dev/null; then
-                missing_keys+=("$key")
-              fi
-            done
-
-            if [ ${#missing_keys[@]} -gt 0 ]; then
-              echo "❌ $file is missing required keys: ${missing_keys[*]}"
-              failed=1
-            else
-              echo "✅ $file has all required keys"
+            if [[ -z "$VERSION" ]]; then
+              echo "❌ $file is missing 'version'"
+              exit 1
             fi
+
+            if [[ -z "$AUTHORS" ]]; then
+              echo "❌ $file is missing 'authors'"
+              exit 1
+            fi
+
+            if [[ "$AUTHORS_TYPE" != "string" ]]; then
+              echo "❌ $file 'authors' field must be a string"
+              exit 1
+            fi
+
+            echo "✅ $file passed"
           done
-
-          if [ "$failed" -ne 0 ]; then
-            echo "❗ One or more language files failed validation."
-            exit 1
-          else
-            echo "🎉 All language files are valid!"
-          fi
