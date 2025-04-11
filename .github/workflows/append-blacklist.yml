@@ -16,17 +16,18 @@ jobs:
       - name: ⬇️ Check out the repository
         uses: actions/checkout@v4
 
-      - name: 🧠 Extract Track ID and Append to Blacklist
+      - name: 🧠 Extract Track ID and Append to GlobalBlacklist.txt
         id: process
         uses: actions/github-script@v7
         with:
           script: |
-            const { readFileSync, writeFileSync, existsSync } = require('fs');
+            const fs = require('fs');
+            const path = require('path');
             const { execSync } = require('child_process');
 
             const issue = context.payload.issue;
-            const issueNumber = issue.number;
             const issueBody = issue.body;
+            const issueNumber = issue.number;
 
             const match = issueBody.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/);
             if (!match) {
@@ -35,17 +36,21 @@ jobs:
             }
 
             const trackId = match[1];
-            const filePath = 'GlobalBlacklist.txt';
+            const filePath = path.join(process.cwd(), 'GlobalBlacklist.txt');
 
-            let existing = existsSync(filePath) ? readFileSync(filePath, 'utf8') : '';
+            let existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+
             if (existing.includes(trackId)) {
               console.log("⚠️ Track ID already exists in the blacklist.");
+              core.setOutput('track_id', trackId);
+              core.setOutput('issue_number', issueNumber);
               return;
             }
 
-            existing += `\n${trackId}`;
-            writeFileSync(filePath, existing.trim() + '\n');
+            // Append new line
+            fs.appendFileSync(filePath, `${trackId}\n`);
 
+            // Git commit and push
             execSync('git config user.name "github-actions[bot]"');
             execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
             execSync(`git add "${filePath}"`);
@@ -60,13 +65,13 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const trackId = core.getInput('track_id');
-            const issueNumber = core.getInput('issue_number');
+            const trackId = '${{ steps.process.outputs.track_id }}';
+            const issueNumber = Number('${{ steps.process.outputs.issue_number }}');
 
             await github.rest.issues.createComment({
-              issue_number: Number(issueNumber),
               owner: context.repo.owner,
               repo: context.repo.repo,
+              issue_number: issueNumber,
               body: `✅ The track \`${trackId}\` has been added to the global blacklist. Thanks for your submission!`
             });
 
@@ -75,11 +80,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const issueNumber = core.getInput('issue_number');
+            const issueNumber = Number('${{ steps.process.outputs.issue_number }}');
 
             await github.rest.issues.update({
-              issue_number: Number(issueNumber),
               owner: context.repo.owner,
               repo: context.repo.repo,
+              issue_number: issueNumber,
               state: 'closed'
             });
