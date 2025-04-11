@@ -366,16 +366,32 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
+                    <!-- Version 1.0.3 -->
+                    <ToggleButton Content="v1.0.3"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_0_3"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_3"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Added Command Customization" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added Translation System" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added English Lang File" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
                     <!-- Version 1.0.2 -->
                     <ToggleButton Content="v1.0.2"
                         Style="{StaticResource SectionToggleButtonStyle}"
-                        IsChecked="True"
+                        IsChecked="False"
                         Checked="ChangelogToggle_Checked"
                         Unchecked="ChangelogToggle_Unchecked"
                         Tag="Changelog_v1_0_2"/>
 
                     <StackPanel x:Name="Changelog_v1_0_2"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         Margin="10,0,0,15">
                         <TextBlock Text="• Added Playback History" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                         <TextBlock Text="• Added Confirm Dialog Popup" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
