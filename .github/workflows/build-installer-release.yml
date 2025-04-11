@@ -1,58 +1,52 @@
-name: 📦 Build Installer and Release
+name: 🚀 Manual Release Build & Installer
 
 on:
   workflow_dispatch:
 
 jobs:
   build-and-release:
-    name: Build Installer and Create Release
+    name: 🔧 Build & Create Installer
     runs-on: windows-latest
-
     permissions:
       contents: write
 
     steps:
-      - name: ⬇️ Checkout repository
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v4
 
-      - name: 🧰 Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: 🛠️ Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.x'
+          dotnet-version: '6.0.x'
 
-      - name: 🔨 Publish Streamerfy (not single file)
+      - name: 🧱 Restore dependencies
+        run: dotnet restore Streamerfy/Streamerfy.csproj
+
+      - name: 📦 Publish Streamerfy (Framework-Dependent)
+        shell: cmd
         run: |
-          dotnet publish Streamerfy/Streamerfy.csproj ^
-            -c Release ^
-            -r win-x64 ^
-            --self-contained true ^
-            -o build_output
+          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 ^
+            --self-contained false ^
+            /p:PublishSingleFile=false ^
+            /p:IncludeNativeLibrariesForSelfExtract=true ^
+            /p:EnableCompressionInSingleFile=true ^
+            /p:IncludeAllContentForSelfExtract=true ^
+            /p:StripDebugSymbols=true
 
-      - name: 🧩 Setup Inno Setup
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
+      - name: 📁 Copy published files to installer folder
+        run: |
+          New-Item -ItemType Directory -Force -Path InstallerPayload
+          Copy-Item -Path Streamerfy\bin\Release\net6.0-windows\win-x64\publish\* -Destination InstallerPayload -Recurse -Force
+
+      - name: 📦 Create Installer (Inno Setup)
+        uses: crazy-max/ghaction-inno-setup@v3
         with:
-          path: installer/StreamerfyInstaller.iss
-
-
-      - name: 🚚 Move installer to output
-        run: |
-          mkdir release
-          move installer/Output/*.exe release/
-
-      - name: 🏷 Get version
-        id: get_version
-        run: |
-          $version = (Select-String -Path Streamerfy/Services/VersionService.cs -Pattern 'CurrentVersion = "(.*?)"').Matches.Groups[1].Value
-          echo "version=$version" >> $env:GITHUB_OUTPUT
+          path: installer/Streamerfy.iss
 
       - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Streamerfy v${{ steps.get_version.outputs.version }}
-          body: |
-            🚀 Streamerfy v${{ steps.get_version.outputs.version }} is now available!
-
-            To install, download and run the setup file.
+          tag_name: v${{ github.run_number }}
+          name: "Streamerfy Installer v${{ github.run_number }}"
           files: |
-            release/*.exe
+            Output/StreamerfyInstaller.exe
