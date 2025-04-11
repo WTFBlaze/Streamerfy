@@ -8,39 +8,81 @@ jobs:
   append-blacklist:
     if: github.event.label.name == 'approved'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
 
     steps:
-      - name: Check out the repository
+      - name: ⬇️ Check out the repository
         uses: actions/checkout@v4
 
-      - name: Extract Track ID and Append
+      - name: 🧠 Extract Track ID and Append to Blacklist
+        id: process
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const issueBody = context.payload.issue.body;
+            const core = require('@actions/core');
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const issueBody = issue.body;
+
             const match = issueBody.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/);
             if (!match) {
-              core.setFailed("No valid Spotify track link found.");
+              core.setFailed("❌ No valid Spotify track link found in the issue body.");
               return;
             }
 
             const trackId = match[1];
-            const filePath = 'Data/GlobalTrackBlacklist.txt'; // adjust path if needed
+            const filePath = 'Data/GlobalTrackBlacklist.txt';
 
             let existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
-
             if (existing.includes(trackId)) {
-              console.log("Track ID already in blacklist.");
+              console.log("⚠️ Track ID already exists in the blacklist.");
               return;
             }
 
+            // Append the new track ID
             existing += `\n${trackId}`;
             fs.writeFileSync(filePath, existing.trim() + '\n');
 
+            // Commit the change
             const execSync = require('child_process').execSync;
             execSync('git config user.name "github-actions[bot]"');
             execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
             execSync('git add ' + filePath);
-            execSync('git commit -m "✅ Auto-added blacklisted track: ' + trackId + '"');
+            execSync(`git commit -m "✅ Auto-added blacklisted track: ${trackId}"`);
             execSync('git push');
+
+            // Save data for next steps
+            core.setOutput('track_id', trackId);
+            core.setOutput('issue_number', issueNumber.toString());
+
+      - name: 💬 Comment on the issue
+        if: steps.process.outputs.track_id != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const trackId = '${{ steps.process.outputs.track_id }}';
+            const issueNumber = ${{ steps.process.outputs.issue_number }};
+
+            await github.rest.issues.createComment({
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ The track \`${trackId}\` has been added to the global blacklist. Thanks for your submission!`
+            });
+
+      - name: 🛑 Close the issue
+        if: steps.process.outputs.track_id != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ steps.process.outputs.issue_number }};
+
+            await github.rest.issues.update({
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+            });
