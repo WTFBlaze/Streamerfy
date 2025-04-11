@@ -47,7 +47,7 @@ jobs:
           dir installer
 
       - name: 🧰 Setup Inno Setup
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.5
         with:
           path: installer/Streamerfy.iss
 
