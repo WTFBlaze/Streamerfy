@@ -8,7 +8,8 @@
     "Tabs_Changelog": "Changelog",
     "Tabs_Settings": "Settings",
 
-    "Button_Connect": "",
+    "Button_Connect": "Connect",
+    "Button_Disconnect": "Disconnect",
     "ConnectionStatus_Connected": "Connected to {CHANNEL}",
     "ConnectionStatus_Disconnected": "Not Connected",
 

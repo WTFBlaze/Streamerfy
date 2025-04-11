@@ -1,4 +1,7 @@
-﻿namespace Streamerfy.Services
+﻿using Streamerfy.Windows;
+using System.Windows.Media;
+
+namespace Streamerfy.Services
 {
     public class ServiceManager
     {
@@ -10,11 +13,6 @@
 
         public static void InitializeServices()
         {
-            Task.Run(async () =>
-            {
-                await LanguageService.InitializeAsync();
-            });
-
             Blacklist = new BlacklistService();
             NowPlaying = new NowPlayingService();
             Playback = new PlaybackHistoryService();

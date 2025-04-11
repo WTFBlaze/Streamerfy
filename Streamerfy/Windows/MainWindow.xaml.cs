@@ -19,6 +19,8 @@ namespace Streamerfy.Windows
     {
         public static MainWindow Instance { get; private set; }
         private int logIndex = 0;
+        private readonly List<(string message, Color color)> _pendingLogs = new();
+        private readonly object _logLock = new();
 
         public MainWindow()
         {
@@ -50,11 +52,14 @@ namespace Streamerfy.Windows
         #endregion
 
         #region Tab Switching Logic
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             TitleVersionText.Text = $"Streamerfy v{VersionService.CurrentVersion}";
             ShowTab(ShowTabType.LOGS);
             CheckForUpdates();
+
+            await LanguageService.WaitUntilReadyAsync();
+            FlushQueuedLogs();
 
             // Process Auto Connect
             if (AutoConnectToggle.IsChecked == true)
@@ -99,32 +104,55 @@ namespace Streamerfy.Windows
         #region Logs Logic
         public void AddLog(string message, Color textColor)
         {
+            if (!LanguageService.IsInitialized)
+            {
+                lock (_logLock)
+                {
+                    _pendingLogs.Add((message, textColor));
+                }
+                return;
+            }
+
             if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => AddLog(message, textColor));
+                return;
             }
-            else
+
+            var background = (logIndex % 2 == 0)
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3b3b3d"))
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2a2a2b"));
+
+            var paragraph = new Paragraph
             {
-                var background = (logIndex % 2 == 0)
-                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3b3b3d")) // normal
-                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2a2a2b")); // darker
+                Background = background,
+                Margin = new Thickness(0, 0, 0, 1),
+                Padding = new Thickness(4, 2, 4, 2)
+            };
 
-                var paragraph = new Paragraph
-                {
-                    Background = background,
-                    Margin = new Thickness(0, 0, 0, 1), // small spacing between logs
-                    Padding = new Thickness(4, 2, 4, 2)
-                };
+            paragraph.Inlines.Add(new Run(message)
+            {
+                Foreground = new SolidColorBrush(textColor)
+            });
 
-                paragraph.Inlines.Add(new Run(message)
-                {
-                    Foreground = new SolidColorBrush(textColor)
-                });
+            LogBox.Document.Blocks.Add(paragraph);
+            logIndex++;
 
-                LogBox.Document.Blocks.Add(paragraph);
-                logIndex++;
+            LogBox.ScrollToEnd();
+        }
 
-                LogBox.ScrollToEnd();
+        public void FlushQueuedLogs()
+        {
+            List<(string message, Color color)> logsToFlush;
+            lock (_logLock)
+            {
+                logsToFlush = _pendingLogs.ToList();
+                _pendingLogs.Clear();
+            }
+
+            foreach (var (msg, color) in logsToFlush)
+            {
+                AddLog(msg, color);
             }
         }
 

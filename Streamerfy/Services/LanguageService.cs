@@ -1,4 +1,5 @@
 ﻿using Streamerfy.Data.ViewModels;
+using Streamerfy.Windows;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -11,12 +12,16 @@ namespace Streamerfy.Services
 
         private static Dictionary<string, string> _translations = new();
         private static string _currentVersion = "0.0.0";
+        private static TaskCompletionSource<bool> _readyTcs = new();
 
         public static LanguageViewModel ViewModel { get; } = new();
+        public static bool IsInitialized { get; private set; } = false;
+        public static Task WaitUntilReadyAsync() => _readyTcs.Task;
 
         public static async Task InitializeAsync()
         {
             Console.WriteLine("[INFO] Initializing LanguageService...");
+            IsInitialized = false;
 
             string lang = App.Settings.Language ?? "en";
             string path = Path.Combine(App.LanguagesFolder, $"{lang}.json");
@@ -24,7 +29,7 @@ namespace Streamerfy.Services
             Console.WriteLine($"[INFO] Selected language: {lang}");
             Console.WriteLine($"[INFO] Checking file at: {path}");
 
-            bool needsDownload = !File.Exists(path)/* || !await IsLanguageFileUpToDate(lang, path)*/;
+            bool needsDownload = !File.Exists(path) || !await IsLanguageFileUpToDate(lang, path);
             if (needsDownload)
             {
                 Console.WriteLine("[INFO] Language file not found. Attempting to download...");
@@ -51,7 +56,13 @@ namespace Streamerfy.Services
             LoadFromFile(path);
             Console.WriteLine("[INFO] Applying translations to UI...");
             ApplyToViewModel();
+
+            _readyTcs.TrySetResult(true);
+            if (MainWindow.Instance == null)
+                Console.WriteLine("MAINWINDOW:INSTANCE IS NULL!");
+            MainWindow.Instance?.FlushQueuedLogs();
             Console.WriteLine("[SUCCESS] LanguageService initialized.");
+            IsInitialized = true;
         }
 
         private static async Task<bool> IsLanguageFileUpToDate(string lang, string localPath)
@@ -145,23 +156,35 @@ namespace Streamerfy.Services
 
         public static string Translate(string key, object? placeholders = null)
         {
+            Console.WriteLine($"[LanguageService] Translate() called with key = '{key}'");
+
             if (!_translations.TryGetValue(key, out var template))
+            {
+                Console.WriteLine($"[LanguageService] ❌ Key '{key}' not found in _translations.");
                 return $"[{key}]";
+            }
+
+            Console.WriteLine($"[LanguageService] ✅ Found key. Template = \"{template}\"");
 
             if (placeholders == null)
+            {
+                Console.WriteLine("[LanguageService] No placeholders provided. Returning template as-is.");
                 return template;
+            }
 
             var result = template;
             var props = placeholders.GetType().GetProperties();
+
             foreach (var prop in props)
             {
                 var placeholder = $"{{{prop.Name}}}";
                 var value = prop.GetValue(placeholders)?.ToString() ?? "";
+                Console.WriteLine($"[LanguageService] Replacing {placeholder} with '{value}'");
                 result = result.Replace(placeholder, value);
             }
 
+            Console.WriteLine($"[LanguageService] Final result: \"{result}\"");
             return result;
         }
-
     }
 }

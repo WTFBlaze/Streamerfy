@@ -116,14 +116,18 @@ namespace Streamerfy.Services
             {
                 try
                 {
+                    await LanguageService.WaitUntilReadyAsync();
+
                     Global = await FetchGlobalBlacklistAsync();
                     MainWindow.Instance.AddLog(LanguageService.Translate("Message_Global_Blacklist_Success"), Colors.LimeGreen);
                 }
                 catch (Exception ex)
                 {
-                    MainWindow.Instance.AddLog(LanguageService.Translate("Message_Global_Blacklist_Failure", new { ERROR = ex.Message}), Colors.Red);
+                    await LanguageService.WaitUntilReadyAsync();
+                    MainWindow.Instance.AddLog(LanguageService.Translate("Message_Global_Blacklist_Failure", new { ERROR = ex.Message }), Colors.Red);
                 }
             });
+
         }
 
         private async Task<HashSet<string>> FetchGlobalBlacklistAsync()

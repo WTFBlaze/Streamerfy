@@ -38,6 +38,10 @@ namespace Streamerfy
             base.OnStartup(e);
             DebugConsole.Init();
             if (!SetupRoamingFiles() || !SetupAppSettings()) return;
+            Task.Run(async () =>
+            {
+                await LanguageService.InitializeAsync();
+            });
             EnsureNowPlayingHtmlExists();
             ServiceManager.InitializeServices();
         }
