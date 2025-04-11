@@ -21,7 +21,6 @@ Made with ❤️ for creators who want more from their music streams.
 - 🧩 **Global Blacklist** – Community-powered banned songs
 - 🎥 **OBS Now Playing Overlay** – Auto-updating HTML overlay for your stream
 - 🧼 **Local Only** – No servers, no tracking. Your data stays with you.
-- 🛠️ **One-Click Build** – Compiles to a single `.exe` (no installer required)
 - 🔊 **Multi-Language** - Supports language files for native language translation
 ---
 
@@ -52,9 +51,10 @@ No paywalls. No premium unlocks. Just good software made for streamers.
 ## 🚀 Quick Start
 
 1. **[Download the latest release](https://github.com/WTFBlaze/Streamerfy/releases)**
-2. **Run `Streamerfy.exe`**
-3. **Configure settings:** Twitch account, OAuth token, Spotify app credentials
-4. **Connect and start queuing songs!**
+2. **Run `StreamerfyInstallervX.X.X.exe`**
+3. **Open `Streamerfy` from your Windows Search Bar**
+4. **Configure settings:** Twitch account, OAuth token, Spotify app credentials
+5. **Connect and start queuing songs!**
 
 > ✅ Full setup walkthroughs, including OBS integration, are now in the [📚 Wiki](https://github.com/WTFBlaze/Streamerfy/wiki)
 
