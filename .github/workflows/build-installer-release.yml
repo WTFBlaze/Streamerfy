@@ -24,7 +24,7 @@ jobs:
       
       - name: 📦 Publish Streamerfy (Framework-Dependent)
         run: |
-          dotnet publish Streamerfy/Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
+          dotnet publish Streamerfy/Streamerfy.csproj -f net6.0-windows -c Release -r win-x64 `
             --self-contained false `
             /p:PublishSingleFile=false `
             /p:IncludeNativeLibrariesForSelfExtract=true `
