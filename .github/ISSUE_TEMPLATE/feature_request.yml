@@ -1,0 +1,50 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement for Streamerfy
+title: "[Feature] <Your idea in a few words>"
+labels: ["enhancement"]
+assignees:
+  - WTFBlaze
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🌟 Feature Request
+
+        Help us improve Streamerfy by sharing your idea!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 🧠 What feature do you want to see?
+      description: Describe the feature in as much detail as possible. What should it do? How should it behave?
+      placeholder: I'd love a way to let VIPs bypass the blacklist...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 🤔 Why is this feature useful?
+      description: Tell us why this would be helpful for your stream or for other users.
+      placeholder: This would let trusted users play songs that might otherwise be blacklisted...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Have you considered any alternatives?
+      description: Are there other ways to accomplish this? If so, why aren't they ideal?
+      placeholder: I tried modifying the blacklist manually, but that only works short-term...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📝 Additional Context
+      description: Add screenshots, mockups, or other context that might help.
+      placeholder: If the UI had a toggle next to each user in chat it would be nice...
+    validations:
+      required: false
