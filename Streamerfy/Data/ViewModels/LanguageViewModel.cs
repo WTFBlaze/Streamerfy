@@ -67,6 +67,32 @@ namespace Streamerfy.Data.ViewModels
                 }
             }
         }
+
+        private string _connectButtonLabel;
+        public string ConnectButtonLabel
+        {
+            get => _connectButtonLabel;
+            set
+            {
+                if (_connectButtonLabel != value)
+                {
+                    _connectButtonLabel = value;
+                    OnPropertyChanged(nameof(ConnectButtonLabel));
+                }
+            }
+        }
+
+        public string Button_Connect
+        {
+            get => this["Button_Connect"];
+            set => this["Button_Connect"] = value;
+        }
+
+        public string Button_Disconnect
+        {
+            get => this["Button_Disconnect"];
+            set => this["Button_Disconnect"] = value;
+        }
         #endregion
 
         #region Logs Page

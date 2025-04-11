@@ -410,7 +410,10 @@ namespace Streamerfy.Windows
             }
             else
             {
-                ConnectButton.Content = state ? "Disconnect" : "Connect";
+                LanguageService.ViewModel.ConnectButtonLabel = state
+                    ? LanguageService.ViewModel.Button_Disconnect
+                    : LanguageService.ViewModel.Button_Connect;
+
             }
         }
 

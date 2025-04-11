@@ -152,6 +152,8 @@ namespace Streamerfy.Services
                 ViewModel[pair.Key] = pair.Value;
                 Console.WriteLine($"[BIND] {pair.Key} = {pair.Value}");
             }
+
+            ViewModel.ConnectButtonLabel = ViewModel.Button_Connect;
         }
 
         public static string Translate(string key, object? placeholders = null)

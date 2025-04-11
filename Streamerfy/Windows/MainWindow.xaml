@@ -684,7 +684,7 @@
 
                 <!-- Bottom-right: Connect button -->
                 <Button x:Name="ConnectButton"
-                    Content="{Binding Settings_Save}"
+                    Content="{Binding ConnectButtonLabel}"
                     Click="ConnectButton_Click"
                     Background="#3a3a3a"
                     Foreground="White"
