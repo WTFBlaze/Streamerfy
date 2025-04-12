@@ -19,7 +19,7 @@ Made with ❤️ for creators who want more from their music streams.
 - 🚫 **Blacklist Management** – Block specific songs or artists
 - 🔞 **Explicit Filter** – Toggle on/off based on your vibe
 - 🧩 **Global Blacklist** – Community-powered banned songs
-- 🎥 **OBS Now Playing Overlay** – Auto-updating HTML overlay for your stream
+- 🎥 **OBS & TikTok Now Playing Overlay** – Auto-updating HTML overlay for your stream
 - 🧼 **Local Only** – No servers, no tracking. Your data stays with you.
 - 🔊 **Multi-Language** - Supports language files for native language translation
 - 🔐 **Permissions Customization** - Change who can run certain commands
@@ -79,7 +79,7 @@ Planned features and future improvements:
 - [ ] Command cooldowns / spam protection
 - [ ] Discord webhook integration
 - [ ] Twitch Channel Point Redeems
-- [ ] TikTok Live integration
+- [ ] TikTok Live integration (Widget Supports TikTok Live Studio but TikTok Chat Requests are still to be added)
 
 > Got an idea? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or leave feedback in [Discussions](https://github.com/WTFBlaze/Streamerfy/discussions)
 
