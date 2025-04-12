@@ -71,6 +71,11 @@ namespace Streamerfy.Windows
                 ServiceManager.Twitch.Connect();
             }
         }
+
+        private void Minimize_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
         #endregion
 
         #region Tab Switching Logic

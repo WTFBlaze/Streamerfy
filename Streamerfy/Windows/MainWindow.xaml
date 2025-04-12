@@ -46,6 +46,38 @@
             <Setter Property="Width" Value="40"/>
         </Style>
         
+        <!-- Minimize Button Style -->
+        <Style x:Key="SquareButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="Transparent"
+                        Padding="0"
+                        SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#e81123"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#c50f1f"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="40"/>
+        </Style>
+
         <!-- Tab Button Style -->
         <Style x:Key="TabButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -292,12 +324,16 @@
                         Foreground="White"
                         VerticalAlignment="Center"
                         Margin="10,0"/>
-                    <Button Style="{StaticResource RoundedCloseButtonStyle}"
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Style="{StaticResource SquareButtonStyle}"
+                            Content="🗕"
+                            Click="Minimize_Click"
+                            Margin="0,0,5,0"/>
+                        <Button Style="{StaticResource RoundedCloseButtonStyle}"
                             Content="✕"
                             Click="Close_Click"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
                             Margin="0"/>
+                    </StackPanel>
                 </Grid>
             </Border>
             
