@@ -1,6 +1,6 @@
 {
     "language": "English",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "authors": "WTFBlaze",
 
     "Tabs_Logs": "Logs",
@@ -53,6 +53,7 @@
 
     "Message_Ready": "✅ Streamerfy ready for use!",
     "Message_Update_Available": "🔔 A new version of Streamerfy ({LATEST_VERSION}) is available (You're on {CURRENT_VERSION})! Download at https://github.com/WTFBlaze/Streamerfy/releases",
+    "Message_NowPlaying_TikTok_Admin": "Admin Permissions are required to enable support for TikTok Live Studio! Please restart Streamerfy as admin to enable TLS support.",
     "Message_Global_Blacklist_Success": "✅ Fetched Global Track Blacklist!",
     "Message_Global_Blacklist_Failure": "⚠️ Failed to fetch Global Track Blacklist! | Err: {ERROR}",
     "Message_NowPlaying": "🎵 Now Playing {SONG} - {ARTIST} (Requested by {REQUESTER})",

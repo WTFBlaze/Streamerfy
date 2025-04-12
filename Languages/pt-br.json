@@ -1,6 +1,6 @@
 {
     "language": "Português Brasileiro",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "authors": "yoitscarolinee",
 
     "Tabs_Logs": "Logs",
@@ -53,6 +53,7 @@
 
     "Message_Ready": "✅ Streamerfy está pronto para ser usado!",
     "Message_Update_Available": "🔔 Uma nova versão do Streamerfy ({LATEST_VERSION}) está disponível (Você está na {CURRENT_VERSION})! Baixe em https://github.com/WTFBlaze/Streamerfy/releases",
+    "Message_NowPlaying_TikTok_Admin": "São necessárias permissões de administrador para habilitar o suporte ao TikTok Live Studio! Reinicie o Streamerfy como administrador para habilitar o suporte a TLS.",
     "Message_Global_Blacklist_Success": "✅ Blacklist de Música Global carregado!",
     "Message_Global_Blacklist_Failure": "⚠️ Falha ao carregar Blacklist de Música Global! | Err: {ERROR}",
     "Message_NowPlaying": "🎵 Tocando agora {SONG} - {ARTIST} (Solicitado por {REQUESTER})",
