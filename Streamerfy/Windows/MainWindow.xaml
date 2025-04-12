@@ -443,16 +443,32 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
+                    <!-- Version 1.0.5 -->
+                    <ToggleButton Content="v1.0.5"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_0_5"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_5"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Added Language Selection dropdown in Settings" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added Command Permissions Customization System" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Added Permissions Section in Settings" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
                     <!-- Version 1.0.4 -->
                     <ToggleButton Content="v1.0.4"
                         Style="{StaticResource SectionToggleButtonStyle}"
-                        IsChecked="True"
+                        IsChecked="False"
                         Checked="ChangelogToggle_Checked"
                         Unchecked="ChangelogToggle_Unchecked"
                         Tag="Changelog_v1_0_4"/>
 
                     <StackPanel x:Name="Changelog_v1_0_4"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         Margin="10,0,0,15">
                         <TextBlock Text="• Upgraded from Standalone exe to Installer File for easier setup" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                     </StackPanel>
