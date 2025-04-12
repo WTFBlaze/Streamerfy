@@ -13,6 +13,7 @@
     <SignAssembly>False</SignAssembly>
     <PackageIcon>Streamerfy_Logo.png</PackageIcon>
     <ApplicationIcon>Streamerfy_Logo.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
