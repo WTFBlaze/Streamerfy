@@ -88,8 +88,11 @@ Planned features and future improvements:
 
 Thank you to everyone contributing to the Language Files 💙
 
-English: [WTFBlaze](https://github.com/WTFBlaze)
-Portuguese-Brazilian: [Caroline Versiani](https://github.com/yoitscarolinee)
+| Language        | Authors      |
+| ------------- | -------------: |
+| English | [WTFBlaze](https://github.com/WTFBlaze) |
+| Portuguese-Brazilian | [Caroline Versiani](https://github.com/yoitscarolinee) |
+
 ---
 
 ## 👨‍💻 Building from Source
