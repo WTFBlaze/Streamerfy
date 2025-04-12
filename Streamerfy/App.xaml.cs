@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Streamerfy.Data.Internal.Json;
 using Streamerfy.Services;
 using Streamerfy.Utils;
+using Streamerfy.Windows;
 using System.Configuration;
 using System.Data;
 using System.IO;
@@ -37,16 +38,42 @@ namespace Streamerfy
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
+            {
+                File.WriteAllText("crash.log", ex.ExceptionObject.ToString());
+            };
+
+            DispatcherUnhandledException += (s, ex) =>
+            {
+                File.WriteAllText("crash_dispatcher.log", ex.Exception.Message + "\n" + ex.Exception.StackTrace);
+                ex.Handled = true;
+            };
+
             base.OnStartup(e);
+
             DebugConsole.Init();
-            if (!SetupRoamingFiles() || !SetupAppSettings()) return;
+
+            bool roamingFiles = SetupRoamingFiles();
+            bool appSettings = SetupAppSettings();
+
+            if (!roamingFiles || !appSettings)
+            {
+                MessageBox.Show($"Failed to initialize application settings. (RoamingFiles: {roamingFiles} | AppSettings: {appSettings}) Exiting.");
+                return;
+            }
+
             Task.Run(async () =>
             {
                 await LanguageService.InitializeAsync();
             });
+
             EnsureNowPlayingHtmlExists();
             EnsureNowPlayingServerHtmlExists();
+
             ServiceManager.InitializeServices();
+
+            var mainWindow = new MainWindow();
+            mainWindow.Show();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -68,7 +95,7 @@ namespace Streamerfy
                 LanguagesFolder = EnsureDirectoryExistance(RoamingFolder, "Languages");
 
                 // Ensure Files
-                SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json");
+                SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json", false);
                 PlaybackFile = EnsureFileExistance(RoamingFolder, "PlaybackHistory.json");
                 SongBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Tracks.json");
                 ArtistBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Artists.json");
@@ -90,44 +117,65 @@ namespace Streamerfy
         #region App Settings Methods
         private bool SetupAppSettings()
         {
+            string logPath = "setup_settings.log";
+            void Log(string message) => File.AppendAllText(logPath, $"[{DateTime.UtcNow}] {message}\n");
+
             try
             {
+                Log("SetupAppSettings: Start");
+
                 if (!File.Exists(SettingsFile))
                 {
+                    Log("Settings file not found. Creating new one.");
                     File.Create(SettingsFile).Close();
                     Settings = new AppSettings();
+                    Log("Initialized new AppSettings");
                     SaveAppSettings();
+                    Log("Saved new AppSettings");
                 }
                 else
                 {
+                    Log("Settings file exists. Reading content.");
                     var content = File.ReadAllText(SettingsFile);
+                    Log($"Content read: {content.Length} characters");
+
                     if (string.IsNullOrEmpty(content))
+                    {
+                        Log("Content is null or empty. Returning false.");
                         return false;
+                    }
 
+                    Log("Parsing JSON...");
                     var rawJson = JObject.Parse(content);
+                    Log("JSON parsed successfully");
 
-                    // Check and migrate old command structure (string to AppCommand)
+                    Log("Running migrations...");
                     MigrateOldCommand(rawJson, "CmdQueue");
                     MigrateOldCommand(rawJson, "CmdBlacklist");
                     MigrateOldCommand(rawJson, "CmdUnblacklist");
                     MigrateOldCommand(rawJson, "CmdBan");
                     MigrateOldCommand(rawJson, "CmdUnban");
+                    Log("Migrations complete");
 
                     var updatedJson = rawJson.ToString();
                     Settings = JsonConvert.DeserializeObject<AppSettings>(updatedJson)!;
+                    Log("Deserialized into AppSettings");
 
-                    // Save to apply structure changes
                     SaveAppSettings();
+                    Log("Saved updated AppSettings");
                 }
             }
             catch (Exception ex)
             {
+                Log($"Exception caught: {ex.Message}\n{ex.StackTrace}");
                 MessageBox.Show($"There was an issue Setting up Streamerfy Settings! | Err Msg: {ex.Message}");
                 return false;
             }
 
+            Log("SetupAppSettings: Success");
             return true;
         }
+
 
         public static void SaveAppSettings()
         {
@@ -218,7 +266,7 @@ namespace Streamerfy
         private string EnsureFileExistance(string path, string fileName, bool createFile = true)
         {
             var fullPath = Path.Combine(path, fileName);
-            if (createFile) // this technically defeats the point of the method but I don't want to create the NowPlaying.html file. Only set it's path.
+            if (createFile)
             {
                 if (!File.Exists(fullPath))
                     File.Create(fullPath).Close();

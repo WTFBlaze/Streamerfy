@@ -1,7 +1,9 @@
 ﻿using Streamerfy.Data.Json;
 using Streamerfy.Windows;
 using System.Collections.Concurrent;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -18,8 +20,8 @@ namespace Streamerfy.Services
 
         private readonly SpotifyService _spotify;
         private readonly BlacklistService _blacklist;
-        private readonly ConnectionCredentials _credentials;
         private readonly ClientOptions _clientOptions;
+        private ConnectionCredentials _credentials;
 
         private string _channel = string.Empty;
         public bool IsConnected => _client != null;
@@ -28,8 +30,6 @@ namespace Streamerfy.Services
         {
             _spotify = spotifyService;
             _blacklist = blacklistService;
-
-            _credentials = new ConnectionCredentials(App.Settings.BotUsername, App.Settings.BotOAuth);
             _clientOptions = new ClientOptions
             {
                 MessagesAllowedInPeriod = 750,
@@ -45,6 +45,13 @@ namespace Streamerfy.Services
             if (string.IsNullOrWhiteSpace(_channel))
                 throw new InvalidOperationException("Twitch channel must be set before connecting.");
 
+            if (string.IsNullOrEmpty(App.Settings.BotUsername) || string.IsNullOrEmpty(App.Settings.BotOAuth))
+            {
+                MainWindow.Instance.AddLog("You must set the Bot Username & Bot OAuth in the Settings before connecting to twitch!", Colors.Red);
+                return;
+            }
+
+            _credentials = new ConnectionCredentials(App.Settings.BotUsername, App.Settings.BotOAuth);
             _customClient = new WebSocketClient(_clientOptions);
             _client = new TwitchClient(_customClient);
             _client.Initialize(_credentials, _channel);
@@ -62,6 +69,7 @@ namespace Streamerfy.Services
                 _client.Disconnect();
                 _client = null;
             }
+            _credentials = null;
             _customClient = null;
             MainWindow.Instance.SetConnectionStatus(string.Empty);
             MainWindow.Instance.AddLog(LanguageService.Translate("Message_Twitch_Disconnected"), Colors.OrangeRed);
