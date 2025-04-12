@@ -32,6 +32,7 @@ namespace Streamerfy
         public static string NowPlayingFolder { get; private set; }
         public static string NowPlayingJSONFile { get; private set; }
         public static string NowPlayingHTMLFile { get; private set; }
+        public static string NowPlayingServerHTMLFile { get; private set; }
         public static string NowPlayingTXTFile { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -44,6 +45,7 @@ namespace Streamerfy
                 await LanguageService.InitializeAsync();
             });
             EnsureNowPlayingHtmlExists();
+            EnsureNowPlayingServerHtmlExists();
             ServiceManager.InitializeServices();
         }
 
@@ -73,6 +75,7 @@ namespace Streamerfy
                 UserBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Users.json");
                 NowPlayingJSONFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.json");
                 NowPlayingHTMLFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.html", false);
+                NowPlayingServerHTMLFile = EnsureFileExistance(NowPlayingFolder, "NowPlayingServer.html", false);
                 NowPlayingTXTFile = EnsureFileExistance(NowPlayingFolder, "NowPlaying.txt");
 
                 return true;
@@ -174,6 +177,33 @@ namespace Streamerfy
             catch (Exception ex)
             {
                 MessageBox.Show($"Error writing NowPlaying.html:\n{ex.Message}", "Streamerfy", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EnsureNowPlayingServerHtmlExists()
+        {
+            if (File.Exists(NowPlayingServerHTMLFile))
+                return;
+
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                const string resourceName = "Streamerfy.Assets.NowPlayingServerTemplate.html";
+
+                using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null)
+                {
+                    MessageBox.Show("Failed to load NowPlayingServer.html from resources.", "Streamerfy", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                using var reader = new StreamReader(stream);
+                string html = reader.ReadToEnd();
+                File.WriteAllText(NowPlayingServerHTMLFile, html);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error writing NowPlayingServer.html:\n{ex.Message}", "Streamerfy", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

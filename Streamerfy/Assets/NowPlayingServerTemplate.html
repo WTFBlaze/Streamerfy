@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Now Playing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+
+        .now-playing {
+            position: relative;
+            width: 350px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-sizing: border-box;
+            z-index: 1;
+            background-color: #000;
+            --blur-url: url('https://as1.ftcdn.net/jpg/03/20/99/98/1000_F_320999864_rgoOBz9EapKO3B5eyDXirMjPTTQqBoVs.jpg');
+        }
+
+            .now-playing::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: var(--blur-url);
+                background-size: cover;
+                background-position: center;
+                filter: blur(18px) brightness(0.6);
+                z-index: 0;
+                transition: background-image 0.4s ease;
+            }
+
+        .cover {
+            width: 64px;
+            height: 64px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #a0a0a0;
+            margin-bottom: 4px;
+        }
+
+        .title-container,
+        .artist-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            padding-right: 10px;
+        }
+
+        .scrolling {
+            white-space: nowrap;
+            display: inline-block;
+            animation: scroll-text 8s linear infinite;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .artist {
+            font-size: 14px;
+            font-weight: 400;
+            color: #ccc;
+        }
+
+        @keyframes scroll-text {
+            0% {
+                transform: translateX(0%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .pause-indicator {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+            .pause-indicator svg {
+                width: 24px;
+                height: 24px;
+                margin-right: 8px;
+                fill: white;
+            }
+
+        .paused .pause-indicator {
+            opacity: 1;
+        }
+
+        .info.fade-in {
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+
+        .info.fade-out {
+            animation: fadeOut 0.2s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="now-playing" id="container">
+        <img id="cover" class="cover" src="" alt="Cover Art" />
+        <div class="info" id="infoBlock">
+            <div class="label" id="label">Now Playing</div>
+            <div class="title-container"><div id="title" class="title"></div></div>
+            <div class="artist-container"><div id="artist" class="artist"></div></div>
+        </div>
+        <div class="pause-indicator" id="pauseIndicator">
+            <svg viewBox="0 0 24 24"><path d="M8 5h3v14H8V5zm5 0h3v14h-3V5z" /></svg>
+            <span>Paused</span>
+        </div>
+    </div>
+
+    <script>
+        let lastTitle = "";
+        let lastArtist = "";
+        let lastIsPlaying = true;
+
+        function applyScrolling(el) {
+            el.classList.remove("scrolling");
+            const container = el.parentElement;
+            if (el.scrollWidth > container.offsetWidth) {
+                el.classList.add("scrolling");
+            }
+        }
+
+        function updateNowPlaying(data) {
+            const title = data.title || "";
+            const artist = data.artist || "";
+            const coverUrl = data.coverUrl || "";
+            const isPlaying = data.isPlaying !== false;
+
+            const container = document.getElementById("container");
+            const infoBlock = document.getElementById("infoBlock");
+            const cover = document.getElementById("cover");
+            const label = document.getElementById("label");
+
+            const songChanged = title !== lastTitle || artist !== lastArtist;
+
+            if (title === "" && artist === "") {
+                label.textContent = "Nothing Playing";
+                document.getElementById("title").textContent = "";
+                document.getElementById("artist").textContent = "";
+                cover.classList.add("hidden");
+                container.style.setProperty('--blur-url', `url('https://as1.ftcdn.net/jpg/03/20/99/98/1000_F_320999864_rgoOBz9EapKO3B5eyDXirMjPTTQqBoVs.jpg')`);
+                container.classList.remove("paused");
+                return;
+            }
+
+            label.textContent = "Now Playing";
+            cover.classList.remove("hidden");
+
+            if (songChanged || lastTitle === "" || lastArtist === "") {
+                infoBlock.classList.remove("fade-in");
+                infoBlock.classList.add("fade-out");
+
+                setTimeout(() => {
+                    document.getElementById("title").textContent = title;
+                    document.getElementById("artist").textContent = artist;
+                    document.getElementById("cover").src = coverUrl;
+                    container.style.setProperty('--blur-url', `url('${coverUrl}')`);
+                    container.classList.toggle("paused", !isPlaying);
+
+                    applyScrolling(document.getElementById("title"));
+                    applyScrolling(document.getElementById("artist"));
+
+                    infoBlock.classList.remove("fade-out");
+                    infoBlock.classList.add("fade-in");
+
+                    lastTitle = title;
+                    lastArtist = artist;
+                    lastIsPlaying = isPlaying;
+                }, 200);
+            } else if (isPlaying !== lastIsPlaying) {
+                container.classList.toggle("paused", !isPlaying);
+                lastIsPlaying = isPlaying;
+            }
+        }
+
+        async function fetchNowPlaying() {
+            try {
+                const response = await fetch("http://streamerfy.local:8080/nowplaying/api/", { cache: "no-store" });
+                const data = await response.json();
+                updateNowPlaying(data);
+            } catch (err) {
+                console.error("Error fetching now playing data", err);
+            }
+        }
+
+        fetchNowPlaying();
+        setInterval(fetchNowPlaying, 1000);
+    </script>
+</body>
+</html>

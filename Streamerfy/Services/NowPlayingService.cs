@@ -2,6 +2,7 @@
 using Streamerfy.Windows;
 using System.IO;
 using System.Net;
+using System.Net.WebSockets;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
@@ -12,12 +13,18 @@ namespace Streamerfy.Services
     public class NowPlayingService
     {
         private readonly HttpListener _listener;
+        private string _currentSongInfo = "{}";
 
         public NowPlayingService()
         {
-            EnsureHostsFileEntry();
+            Task.Run(async () =>
+            {
+                await EnsureHostsFileEntry();
+            });
+
             _listener = new HttpListener();
-            _listener.Prefixes.Add("http://localhost:8080/nowplaying/");
+            _listener.Prefixes.Add("http://127.0.0.1:8080/nowplaying/");
+
             Task.Run(async () =>
             {
                 await StartAsync();
@@ -39,19 +46,36 @@ namespace Streamerfy.Services
         private async Task ProcessRequestAsync(HttpListenerContext context)
         {
             var response = context.Response;
-            response.ContentType = "text/html";
 
-            if (File.Exists(App.NowPlayingHTMLFile))
+            if (context.Request.Url.AbsolutePath == "/nowplaying/api/" || context.Request.Url.AbsolutePath == "/nowplaying/api")
             {
-                var htmlContent = await File.ReadAllTextAsync(App.NowPlayingHTMLFile);
-                var buffer = Encoding.UTF8.GetBytes(htmlContent);
+                response.ContentType = "application/json";
+                var buffer = Encoding.UTF8.GetBytes(_currentSongInfo);
                 response.ContentLength64 = buffer.Length;
                 await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+            }
+            else if (context.Request.Url.AbsolutePath == "/nowplaying/" || context.Request.Url.AbsolutePath == "/nowplaying")
+            {
+                response.ContentType = "text/html";
+                if (File.Exists(App.NowPlayingServerHTMLFile))
+                {
+                    var htmlContent = await File.ReadAllTextAsync(App.NowPlayingServerHTMLFile);
+                    var buffer = Encoding.UTF8.GetBytes(htmlContent);
+                    response.ContentLength64 = buffer.Length;
+                    await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                }
+                else
+                {
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    var buffer = Encoding.UTF8.GetBytes("HTML file not found");
+                    response.ContentLength64 = buffer.Length;
+                    await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                }
             }
             else
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                var buffer = Encoding.UTF8.GetBytes("HTML file not found");
+                var buffer = Encoding.UTF8.GetBytes("Endpoint not found");
                 response.ContentLength64 = buffer.Length;
                 await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
             }
@@ -66,23 +90,27 @@ namespace Streamerfy.Services
             Console.WriteLine("[Info] Local HTTP server stopped...");
         }
 
-        private void EnsureHostsFileEntry()
+        private async Task EnsureHostsFileEntry()
         {
             const string hostsFilePath = @"C:\Windows\System32\drivers\etc\hosts";
             const string entry = "127.0.0.1 streamerfy.local";
 
-            if (!IsAdministrator())
+            var lines = File.ReadAllLines(hostsFilePath);
+            if (lines.Any(line => line.Trim() == entry))
             {
-                MainWindow.Instance?.AddLog(LanguageService.Translate("Message_NowPlaying_TikTok_Admin"), Colors.Red);
+                // Entry already exists, no need to warn or modify
                 return;
             }
 
-            var lines = File.ReadAllLines(hostsFilePath);
-            if (!lines.Any(line => line.Trim() == entry))
+            if (!IsAdministrator())
             {
-                File.AppendAllText(hostsFilePath, Environment.NewLine + entry);
-                Console.WriteLine("[INFO] Added streamerfy.local entry to hosts file.");
+                await LanguageService.WaitUntilReadyAsync();
+                MainWindow.Instance.AddLog(LanguageService.Translate("Message_NowPlaying_TikTok_Admin"), Colors.Red);
+                return;
             }
+
+            File.AppendAllText(hostsFilePath, Environment.NewLine + entry);
+            Console.WriteLine("[INFO] Added streamerfy.local entry to hosts file.");
         }
 
         private bool IsAdministrator()
@@ -105,6 +133,7 @@ namespace Streamerfy.Services
                 };
 
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                _currentSongInfo = json;
                 File.WriteAllText(App.NowPlayingJSONFile, json);
                 File.WriteAllText(App.NowPlayingTXTFile, $"{title} - {artist}");
             }
@@ -114,11 +143,11 @@ namespace Streamerfy.Services
             }
         }
 
-
         public void Clear()
         {
             try
             {
+                _currentSongInfo = "{}";
                 if (File.Exists(App.NowPlayingJSONFile))
                     File.WriteAllText(App.NowPlayingJSONFile, "{}");
 
