@@ -57,6 +57,11 @@ namespace Streamerfy.Windows
             await LanguageService.WaitUntilReadyAsync();
             AddLog(LanguageService.Translate("Message_Ready"), Colors.LimeGreen);
             FlushQueuedLogs();
+
+            LanguageService.ViewModel.ConnectionStatusDynamic = ServiceManager.Twitch.IsConnected ? 
+                LanguageService.Translate("ConnectionStatus_Connected", new { CHANNEL = ServiceManager.Twitch.GetChannel() })
+                : LanguageService.Translate("ConnectionStatus_Disconnected");
+
             PopulateLanguageDropdown();
 
             // Process Auto Connect
@@ -359,6 +364,9 @@ namespace Streamerfy.Windows
                 App.SaveAppSettings();
 
                 await LanguageService.InitializeAsync();
+                await LanguageService.WaitUntilReadyAsync();
+
+                SetConnectionStatus(ServiceManager.Twitch.GetChannel());
             }
         }
 

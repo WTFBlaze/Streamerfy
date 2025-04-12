@@ -37,6 +37,7 @@ namespace Streamerfy.Services
             };
         }
 
+        public string GetChannel() => _channel;
         public void SetChannel(string channel) => _channel = channel;
 
         public void Connect()

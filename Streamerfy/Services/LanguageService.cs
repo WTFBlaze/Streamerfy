@@ -23,6 +23,7 @@ namespace Streamerfy.Services
             if (IsInitialized)
             {
                 IsInitialized = false;
+                _readyTcs.TrySetResult(false);
                 Console.WriteLine("[INFO] Re-initializing LanguageService...");
             }
             else

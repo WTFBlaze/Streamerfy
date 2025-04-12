@@ -368,7 +368,7 @@
 
                 <StackPanel Margin="10">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,20">
-                        <TextBlock Text="Playback History"
+                        <TextBlock Text="{Binding History_Title}"
                             Foreground="White"
                             FontSize="16"
                             FontWeight="Bold"

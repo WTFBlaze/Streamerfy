@@ -54,7 +54,7 @@ namespace Streamerfy.Data.ViewModels
         #endregion
 
         #region Global UI
-        private string _connectionStatus = "Not Connected"; // Default fallback
+        private string _connectionStatus; // Default fallback
         public string ConnectionStatusDynamic
         {
             get => _connectionStatus;
