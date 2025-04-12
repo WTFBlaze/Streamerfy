@@ -84,6 +84,13 @@ Planned features and future improvements:
 > Got an idea? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or leave feedback in [Discussions](https://github.com/WTFBlaze/Streamerfy/discussions)
 
 ---
+## Language Translation Credits
+
+Thank you to everyone contributing to the Language Files 💙
+
+English: [WTFBlaze](https://github.com/WTFBlaze)
+Portuguese-Brazilian: [Caroline Versiani](https://github.com/yoitscarolinee)
+---
 
 ## 👨‍💻 Building from Source
 
