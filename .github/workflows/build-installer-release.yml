@@ -48,6 +48,12 @@ jobs:
           Invoke-WebRequest `
             -Uri "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe" `
             -OutFile "installer/InstallerPayload/windowsdesktop-runtime-6.0.36-win-x64.exe"
+
+      - name: 🌐 Download Visual C++ Runtime 2015-2022 Redistributable
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" `
+            -OutFile "installer/InstallerPayload/vc_redist.x64.exe"
       
       - name: 🛠 Compile Installer (Inno Setup)
         run: |
