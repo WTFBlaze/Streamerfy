@@ -38,6 +38,9 @@ Filename: "netsh"; Parameters: "http add urlacl url=http://+:8080/ user=Everyone
 ; Launch app (optional)
 Filename: "{app}\Streamerfy.exe"; Description: "{cm:LaunchProgram,Streamerfy}"; Flags: nowait postinstall skipifsilent
 
+[UninstallRun]
+Filename: "netsh"; Parameters: "http delete urlacl url=http://+:8080/"; StatusMsg: "Removing HTTP access registration..."; Flags: runhidden
+
 [Code]
 function NeedsDotNet(): Boolean;
 begin
