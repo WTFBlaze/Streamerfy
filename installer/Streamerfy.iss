@@ -36,7 +36,7 @@ Filename: "{tmp}\windowsdesktop-runtime-6.0.36-win-x64.exe"; Parameters: "/insta
 Filename: "netsh"; Parameters: "http add urlacl url=http://+:8080/ user=Everyone"; StatusMsg: "Registering HTTP access on port 8080..."; Flags: runhidden
 
 ; Launch app (optional)
-Filename: "{app}\Streamerfy.exe"; Description: "{cm:LaunchProgram,Streamerfy}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Streamerfy.exe"; Description: "{cm:LaunchProgram,Streamerfy}"; Flags: nowait postinstall skipifsilent runasoriginaluser runasadmin
 
 [UninstallRun]
 Filename: "netsh"; Parameters: "http delete urlacl url=http://+:8080/"; StatusMsg: "Removing HTTP access registration..."; Flags: runhidden
