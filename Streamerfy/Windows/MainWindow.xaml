@@ -753,7 +753,7 @@
 
                     <!-- Permission Roles Section -->
                     <ToggleButton x:Name="PermissionsSectionToggle"
-                        Content="Permissions Settings"
+                        Content="{Binding Settings_Category_Permissions}"
                         Style="{StaticResource SectionToggleButtonStyle}"
                         IsChecked="False"
                         Checked="PermissionsSectionToggle_Checked"
@@ -764,118 +764,118 @@
                         Visibility="Collapsed"
                         Margin="10,0,0,10">
 
-                        <TextBlock Text="Choose which roles are allowed to use each command:"
+                        <TextBlock Text="{Binding Settings_Permissions_Note_1}"
                             Foreground="White"
                             FontSize="13"
                             Margin="0,0,0,10"/>
 
-                        <TextBlock Text="if none are selected everyone can use the command."
+                        <TextBlock Text="{Binding Settings_Permissions_Note_2}"
                             Foreground="White"
                             FontSize="13"
                             Margin="0,0,0,10"
                             FontStyle="Italic"/>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Queue Command"
+                            <TextBlock Text="{Binding Settings_Permissions_Queue}"
                                 Foreground="White"
                                 FontSize="13"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="QueueAllowVIP"
-                                    Content="VIPs"
+                                    Content="{Binding Settings_Role_VIP}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="QueueAllowSub"
-                                    Content="Subs"
+                                    Content="{Binding Settings_Role_Subs}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="QueueAllowMod"
-                                    Content="Mods"
+                                    Content="{Binding Settings_Role_Mods}"
                                     Foreground="White" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Blacklist Command"
+                            <TextBlock Text="{Binding Settings_Permissions_Blacklist}"
                                 Foreground="White"
                                 FontSize="13"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="BlacklistAllowVIP"
-                                    Content="VIPs"
+                                    Content="{Binding Settings_Role_VIP}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="BlacklistAllowSub"
-                                    Content="Subs"
+                                    Content="{Binding Settings_Role_Subs}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="BlacklistAllowMod"
-                                    Content="Mods"
+                                    Content="{Binding Settings_Role_Mods}"
                                     Foreground="White" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Unblacklist Command"
+                            <TextBlock Text="{Binding Settings_Permissions_Unblacklist}"
                                 Foreground="White"
                                 FontSize="13"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="UnblacklistAllowVIP"
-                                    Content="VIPs"
+                                    Content="{Binding Settings_Role_VIP}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="UnblacklistAllowSub"
-                                    Content="Subs"
+                                    Content="{Binding Settings_Role_Subs}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="UnblacklistAllowMod"
-                                    Content="Mods"
+                                    Content="{Binding Settings_Role_Mods}"
                                     Foreground="White" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Ban Command"
+                            <TextBlock Text="{Binding Settings_Permissions_Ban}"
                                 Foreground="White"
                                 FontSize="13"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="BanAllowVIP"
-                                    Content="VIPs"
+                                    Content="{Binding Settings_Role_VIP}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="BanAllowSub"
-                                    Content="Subs"
+                                    Content="{Binding Settings_Role_Subs}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="BanAllowMod"
-                                    Content="Mods"
+                                    Content="{Binding Settings_Role_Mods}"
                                     Foreground="White" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,10">
-                            <TextBlock Text="Unban Command"
+                            <TextBlock Text="{Binding Settings_Permissions_Unban}"
                                 Foreground="White"
                                 FontSize="13"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="UnbanAllowVIP"
-                                    Content="VIPs"
+                                    Content="{Binding Settings_Role_VIP}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="UnbanAllowSub"
-                                    Content="Subs"
+                                    Content="{Binding Settings_Role_Subs}"
                                     Foreground="White"
                                     Margin="0,0,10,0" />
 
                                 <CheckBox x:Name="UnbanAllowMod"
-                                    Content="Mods"
+                                    Content="{Binding Settings_Role_Mods}"
                                     Foreground="White" />
                             </StackPanel>
                         </StackPanel>

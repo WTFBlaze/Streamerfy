@@ -233,6 +233,72 @@ namespace Streamerfy.Data.ViewModels
             set => this["Settings_Command_Unban"] = value;
         }
 
+        public string Settings_Category_Permissions
+        {
+            get => this["Settings_Category_Permissions"];
+            set => this["Settings_Category_Permissions"] = value;
+        }
+
+        public string Settings_Permissions_Note_1
+        {
+            get => this["Settings_Permissions_Note_1"];
+            set => this["Settings_Permissions_Note_1"] = value;
+        }
+
+        public string Settings_Permissions_Note_2
+        {
+            get => this["Settings_Permissions_Note_2"];
+            set => this["Settings_Permissions_Note_2"] = value;
+        }
+
+        public string Settings_Permissions_Queue
+        {
+            get => this["Settings_Permissions_Queue"];
+            set => this["Settings_Permissions_Queue"] = value;
+        }
+
+        public string Settings_Permissions_Blacklist
+        {
+            get => this["Settings_Permissions_Blacklist"];
+            set => this["Settings_Permissions_Blacklist"] = value;
+        }
+
+        public string Settings_Permissions_Unblacklist
+        {
+            get => this["Settings_Permissions_Unblacklist"];
+            set => this["Settings_Permissions_Unblacklist"] = value;
+        }
+
+        public string Settings_Permissions_Ban
+        {
+            get => this["Settings_Permissions_Ban"];
+            set => this["Settings_Permissions_Ban"] = value;
+        }
+
+        public string Settings_Permissions_Unban
+        {
+            get => this["Settings_Permissions_Unban"];
+            set => this["Settings_Permissions_Unban"] = value;
+        }
+
+        public string Settings_Role_VIP
+        {
+            get => this["Settings_Role_VIP"];
+            set => this["Settings_Role_VIP"] = value;
+        }
+
+        public string Settings_Role_Subs
+        {
+            get => this["Settings_Role_Subs"];
+            set => this["Settings_Role_Subs"] = value;
+        }
+
+        public string Settings_Role_Mods
+        {
+            get => this["Settings_Role_Mods"];
+            set => this["Settings_Role_Mods"] = value;
+        }
+
         public string Settings_Save
         {
             get => this["Settings_Save"];
