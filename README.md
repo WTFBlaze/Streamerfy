@@ -22,6 +22,7 @@ Made with ❤️ for creators who want more from their music streams.
 - 🎥 **OBS Now Playing Overlay** – Auto-updating HTML overlay for your stream
 - 🧼 **Local Only** – No servers, no tracking. Your data stays with you.
 - 🔊 **Multi-Language** - Supports language files for native language translation
+- 🔐 **Permissions Customization** - Change who can run certain commands
 ---
 
 ## 🖼 Preview
@@ -74,7 +75,7 @@ Planned features and future improvements:
 - [x] Auto-update checker
 - [x] Playback history
 - [x] Language localizations
-- [ ] Permission roles (VIPs, Subs, Mods)
+- [x] Permission roles (VIPs, Subs, Mods)
 - [ ] Command cooldowns / spam protection
 - [ ] Discord webhook integration
 - [ ] Twitch Channel Point Redeems
