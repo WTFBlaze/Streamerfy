@@ -1,6 +1,6 @@
 {
     "language": "English",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "authors": "WTFBlaze",
 
     "Tabs_Logs": "Logs",
@@ -39,6 +39,9 @@
     "Settings_Command_Ban": "Ban User",
     "Settings_Command_Unban": "Unban User",
     "Settings_Save": "Save Settings",
+    "Settings_Role_VIP": "VIPs",
+    "Settings_Role_Subs": "Subs",
+    "Settings_Role_Mods": "Mods",
 
     "Message_Ready": "✅ Streamerfy ready for use!",
     "Message_Update_Available": "🔔 A new version of Streamerfy ({LATEST_VERSION}) is available (You're on {CURRENT_VERSION})! Download at https://github.com/WTFBlaze/Streamerfy/releases",

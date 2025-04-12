@@ -1,4 +1,6 @@
-﻿namespace Streamerfy.Data.Internal.Json
+﻿using Streamerfy.Data.Json;
+
+namespace Streamerfy.Data.Internal.Json
 {
     public class AppSettings
     {
@@ -11,10 +13,10 @@
         public string SpotifyClientSecret { get; set; } = string.Empty;
         public string Language { get; set; } = "en";
         public string CmdPrefix { get; set; } = "!";
-        public string CmdQueue { get; set; } = "queue";
-        public string CmdBlacklist { get; set; } = "blacklist";
-        public string CmdUnblacklist { get; set; } = "unblacklist";
-        public string CmdBan { get; set; } = "ban";
-        public string CmdUnban { get; set; } = "unban";
+        public AppCommand CmdQueue { get; set; } = new AppCommand("queue", false, false, false);
+        public AppCommand CmdBlacklist { get; set; } = new AppCommand("blacklist", false, false, true);
+        public AppCommand CmdUnblacklist { get; set; } = new AppCommand("unblacklist", false, false, true);
+        public AppCommand CmdBan { get; set; } = new AppCommand("ban", false, false, true);
+        public AppCommand CmdUnban { get; set; } = new AppCommand("unban", false, false, true);
     }
 }

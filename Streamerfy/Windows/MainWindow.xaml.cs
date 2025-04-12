@@ -34,8 +34,6 @@ namespace Streamerfy.Windows
 
             // Apply Current Log Settings to Fields
             ApplySettingsToUI();
-
-            AddLog(LanguageService.Translate("Message_Ready"), Colors.LimeGreen);
         }
 
         #region Window Events Logic
@@ -49,9 +47,7 @@ namespace Streamerfy.Windows
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
         }
-        #endregion
 
-        #region Tab Switching Logic
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             TitleVersionText.Text = $"Streamerfy v{VersionService.CurrentVersion}";
@@ -59,6 +55,7 @@ namespace Streamerfy.Windows
             CheckForUpdates();
 
             await LanguageService.WaitUntilReadyAsync();
+            AddLog(LanguageService.Translate("Message_Ready"), Colors.LimeGreen);
             FlushQueuedLogs();
             PopulateLanguageDropdown();
 
@@ -69,7 +66,9 @@ namespace Streamerfy.Windows
                 ServiceManager.Twitch.Connect();
             }
         }
+        #endregion
 
+        #region Tab Switching Logic
         private void ShowTab(ShowTabType type)
         {
             // Set Visbility
@@ -297,11 +296,26 @@ namespace Streamerfy.Windows
             ClientIDField.Text = App.Settings.SpotifyClientId ?? "";
             ClientSecretField.Text = App.Settings.SpotifyClientSecret ?? "";
             CmdPrefixField.Text = App.Settings.CmdPrefix ?? "";
-            QueueCmdField.Text = App.Settings.CmdQueue ?? "";
-            BlacklistCmdField.Text = App.Settings.CmdBlacklist ?? "";
-            UnblacklistCmdField.Text = App.Settings.CmdUnblacklist ?? "";
-            BanUserCmdField.Text = App.Settings.CmdBan ?? "";
-            UnbanUserCmdField.Text = App.Settings.CmdUnban ?? "";
+            QueueCmdField.Text = App.Settings.CmdQueue.Command ?? "";
+            BlacklistCmdField.Text = App.Settings.CmdBlacklist.Command ?? "";
+            UnblacklistCmdField.Text = App.Settings.CmdUnblacklist.Command ?? "";
+            BanUserCmdField.Text = App.Settings.CmdBan.Command ?? "";
+            UnbanUserCmdField.Text = App.Settings.CmdUnban.Command ?? "";
+            QueueAllowVIP.IsChecked = App.Settings.CmdQueue.AllowVIP;
+            QueueAllowSub.IsChecked = App.Settings.CmdQueue.AllowSub;
+            QueueAllowMod.IsChecked = App.Settings.CmdQueue.AllowMod;
+            BlacklistAllowVIP.IsChecked = App.Settings.CmdBlacklist.AllowVIP;
+            BlacklistAllowSub.IsChecked = App.Settings.CmdBlacklist.AllowSub;
+            BlacklistAllowMod.IsChecked = App.Settings.CmdBlacklist.AllowMod;
+            UnblacklistAllowVIP.IsChecked = App.Settings.CmdUnblacklist.AllowVIP;
+            UnblacklistAllowSub.IsChecked = App.Settings.CmdUnblacklist.AllowSub;
+            UnblacklistAllowMod.IsChecked = App.Settings.CmdUnblacklist.AllowMod;
+            BanAllowVIP.IsChecked = App.Settings.CmdBan.AllowVIP;
+            BanAllowSub.IsChecked = App.Settings.CmdBan.AllowSub;
+            BanAllowMod.IsChecked = App.Settings.CmdBan.AllowMod;
+            UnbanAllowVIP.IsChecked = App.Settings.CmdUnban.AllowVIP;
+            UnbanAllowSub.IsChecked = App.Settings.CmdUnban.AllowSub;
+            UnbanAllowMod.IsChecked = App.Settings.CmdUnban.AllowMod;
         }
 
         private void SaveSettings_Click(object sender, RoutedEventArgs e)
@@ -314,12 +328,38 @@ namespace Streamerfy.Windows
             App.Settings.SpotifyClientId = ClientIDField.Text;
             App.Settings.SpotifyClientSecret = ClientSecretField.Text;
             App.Settings.CmdPrefix = CmdPrefixField.Text;
-            App.Settings.CmdQueue = QueueCmdField.Text;
-            App.Settings.CmdBlacklist = BlacklistCmdField.Text;
-            App.Settings.CmdUnblacklist = UnblacklistCmdField.Text;
-            App.Settings.CmdBan = BanUserCmdField.Text;
-            App.Settings.CmdUnban = UnbanUserCmdField.Text;
+            App.Settings.CmdQueue.Command = QueueCmdField.Text;
+            App.Settings.CmdBlacklist.Command = BlacklistCmdField.Text;
+            App.Settings.CmdUnblacklist.Command = UnblacklistCmdField.Text;
+            App.Settings.CmdBan.Command = BanUserCmdField.Text;
+            App.Settings.CmdUnban.Command = UnbanUserCmdField.Text;
+            App.Settings.CmdQueue.AllowVIP = QueueAllowVIP.IsChecked ?? false;
+            App.Settings.CmdQueue.AllowSub = QueueAllowSub.IsChecked ?? false;
+            App.Settings.CmdQueue.AllowMod = QueueAllowMod.IsChecked ?? false;
+            App.Settings.CmdBlacklist.AllowVIP = BlacklistAllowVIP.IsChecked ?? false;
+            App.Settings.CmdBlacklist.AllowSub = BlacklistAllowSub.IsChecked ?? false;
+            App.Settings.CmdBlacklist.AllowMod = BlacklistAllowMod.IsChecked ?? false;
+            App.Settings.CmdUnblacklist.AllowVIP = UnblacklistAllowVIP.IsChecked ?? false;
+            App.Settings.CmdUnblacklist.AllowSub = UnblacklistAllowSub.IsChecked ?? false;
+            App.Settings.CmdUnblacklist.AllowMod = UnblacklistAllowMod.IsChecked ?? false;
+            App.Settings.CmdBan.AllowVIP = BanAllowVIP.IsChecked ?? false;
+            App.Settings.CmdBan.AllowSub = BanAllowSub.IsChecked ?? false;
+            App.Settings.CmdBan.AllowMod = BanAllowMod.IsChecked ?? false;
+            App.Settings.CmdUnban.AllowVIP = UnbanAllowVIP.IsChecked ?? false;
+            App.Settings.CmdUnban.AllowSub = UnbanAllowSub.IsChecked ?? false;
+            App.Settings.CmdUnban.AllowMod = UnbanAllowMod.IsChecked ?? false;
             App.SaveAppSettings();
+        }
+
+        private async void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LanguageSelector.SelectedItem is string selectedLang && selectedLang != App.Settings.Language)
+            {
+                App.Settings.Language = selectedLang;
+                App.SaveAppSettings();
+
+                await LanguageService.InitializeAsync();
+            }
         }
 
         private void UsernameField_TextChanged(object sender, TextChangedEventArgs e)
@@ -365,15 +405,14 @@ namespace Streamerfy.Windows
             CommandsSectionPanel.Visibility = Visibility.Collapsed;
         }
 
-        private async void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void PermissionsSectionToggle_Checked(object sender, RoutedEventArgs e)
         {
-            if (LanguageSelector.SelectedItem is string selectedLang && selectedLang != App.Settings.Language)
-            {
-                App.Settings.Language = selectedLang;
-                App.SaveAppSettings();
+            PermissionsSectionPanel.Visibility = Visibility.Visible;
+        }
 
-                await LanguageService.InitializeAsync();
-            }
+        private void PermissionsSectionToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PermissionsSectionPanel.Visibility = Visibility.Collapsed;
         }
 
         #endregion

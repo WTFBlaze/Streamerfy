@@ -1,4 +1,5 @@
-﻿using Streamerfy.Windows;
+﻿using Streamerfy.Data.Json;
+using Streamerfy.Windows;
 using System.Collections.Concurrent;
 using System.Windows.Media;
 using TwitchLib.Client;
@@ -68,7 +69,28 @@ namespace Streamerfy.Services
 
         #region Internal Methods
         private void SendMessage(string msg) => _client.SendMessage(_channel, msg);
+
         private void Reject(string reason) => SendMessage($"❌ {reason}");
+
+        private bool HasPermission(AppCommand cmd, ChatMessage user)
+        {
+            if (user.IsBroadcaster)
+                return true;
+
+            if (cmd.AllowEveryone)
+                return true;
+
+            if (cmd.AllowMod && user.IsModerator)
+                return true;
+
+            if (cmd.AllowVIP && user.IsVip)
+                return true;
+
+            if (cmd.AllowSub && user.IsSubscriber)
+                return true;
+
+            return false;
+        }
         #endregion
 
         #region Event Methods
@@ -107,8 +129,11 @@ namespace Streamerfy.Services
 
             switch (command)
             {
-                case var cmd when cmd == App.Settings.CmdQueue:
+                case var cmd when cmd == App.Settings.CmdQueue.Command:
                     {
+                        if (!HasPermission(App.Settings.CmdQueue, e.ChatMessage))
+                            return;
+
                         if (arg1 == null)
                         {
                             Reject(LanguageService.Translate("Message_Chat_Missing_Link"));
@@ -160,9 +185,11 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case var cmd when cmd == App.Settings.CmdBlacklist:
+                case var cmd when cmd == App.Settings.CmdBlacklist.Command:
                     {
-                        if (!user.IsModerator && !user.IsBroadcaster) return;
+                        if (!HasPermission(App.Settings.CmdBlacklist, e.ChatMessage))
+                            return;
+
                         if (arg1 == null || arg2 == null)
                         {
                             Reject("Usage: !blacklist [track|artist] [url]");
@@ -217,9 +244,11 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case var cmd when cmd == App.Settings.CmdUnblacklist:
+                case var cmd when cmd == App.Settings.CmdUnblacklist.Command:
                     {
-                        if (!user.IsModerator && !user.IsBroadcaster) return;
+                        if (!HasPermission(App.Settings.CmdUnblacklist, e.ChatMessage))
+                            return;
+
                         if (arg1 == null || arg2 == null)
                         {
                             Reject(LanguageService.Translate("Message_Unblacklist_Usage"));
@@ -275,9 +304,11 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case var cmd when cmd == App.Settings.CmdBan:
+                case var cmd when cmd == App.Settings.CmdBan.Command:
                     {
-                        if (!user.IsModerator && !user.IsBroadcaster) return;
+                        if (!HasPermission(App.Settings.CmdBan, e.ChatMessage))
+                            return;
+
                         if (arg1 == null)
                         {
                             Reject(LanguageService.Translate("Message_Ban_Usage"));
@@ -302,9 +333,11 @@ namespace Streamerfy.Services
                     }
                     break;
 
-                case var cmd when cmd == App.Settings.CmdUnban:
+                case var cmd when cmd == App.Settings.CmdUnban.Command:
                     {
-                        if (!user.IsModerator && !user.IsBroadcaster) return;
+                        if (!HasPermission(App.Settings.CmdUnban, e.ChatMessage))
+                            return;
+
                         if (arg1 == null)
                         {
                             Reject(LanguageService.Translate("Message_Unban_Usage"));

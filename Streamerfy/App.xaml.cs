@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Streamerfy.Data.Internal.Json;
 using Streamerfy.Services;
 using Streamerfy.Utils;
@@ -100,14 +101,20 @@ namespace Streamerfy
                     if (string.IsNullOrEmpty(content))
                         return false;
 
-                    var obj = JsonConvert.DeserializeObject<AppSettings>(content);
-                    if (obj == null)
-                    {
-                        MessageBox.Show("Failed to Setup Streamerfy Settings! | Err Msg: \"Failedto Deserialize Settings.json\"");
-                        return false;
-                    }
+                    var rawJson = JObject.Parse(content);
 
-                    Settings = obj;
+                    // Check and migrate old command structure (string to AppCommand)
+                    MigrateOldCommand(rawJson, "CmdQueue");
+                    MigrateOldCommand(rawJson, "CmdBlacklist");
+                    MigrateOldCommand(rawJson, "CmdUnblacklist");
+                    MigrateOldCommand(rawJson, "CmdBan");
+                    MigrateOldCommand(rawJson, "CmdUnban");
+
+                    var updatedJson = rawJson.ToString();
+                    Settings = JsonConvert.DeserializeObject<AppSettings>(updatedJson)!;
+
+                    // Save to apply structure changes
+                    SaveAppSettings();
                 }
             }
             catch (Exception ex)
@@ -115,6 +122,7 @@ namespace Streamerfy
                 MessageBox.Show($"There was an issue Setting up Streamerfy Settings! | Err Msg: {ex.Message}");
                 return false;
             }
+
             return true;
         }
 
@@ -122,6 +130,22 @@ namespace Streamerfy
         {
             var content = JsonConvert.SerializeObject(Settings, Formatting.Indented);
             File.WriteAllText(SettingsFile, content);
+        }
+
+        private void MigrateOldCommand(JObject rawJson, string propName)
+        {
+            var token = rawJson[propName];
+            if (token != null && token.Type == JTokenType.String)
+            {
+                var oldValue = token.Value<string>();
+                rawJson[propName] = new JObject
+                {
+                    ["Command"] = oldValue,
+                    ["AllowVIP"] = false,
+                    ["AllowSub"] = false,
+                    ["AllowMod"] = false
+                };
+            }
         }
         #endregion
 

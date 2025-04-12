@@ -532,7 +532,7 @@
             <!-- Settings Panel -->
             <ScrollViewer x:Name="SettingsPanel"
                 Grid.Row="2"
-                Visibility="Visible"
+                Visibility="Collapsed"
                 Margin="10"
                 Background="#252526"
                 VerticalScrollBarVisibility="Auto"
@@ -561,8 +561,6 @@
                             HorizontalAlignment="Left"
                             SelectionChanged="LanguageSelector_SelectionChanged"/>
                     </StackPanel>
-
-
 
                     <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Settings_Auto_Connect}"
@@ -752,6 +750,137 @@
                                 FontSize="13"/>
                         </StackPanel>
                     </StackPanel>
+
+                    <!-- Permission Roles Section -->
+                    <ToggleButton x:Name="PermissionsSectionToggle"
+                        Content="Permissions Settings"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="False"
+                        Checked="PermissionsSectionToggle_Checked"
+                        Unchecked="PermissionsSectionToggle_Unchecked"
+                        Margin="0,0,0,10"/>
+
+                    <StackPanel x:Name="PermissionsSectionPanel"
+                        Visibility="Collapsed"
+                        Margin="10,0,0,10">
+
+                        <TextBlock Text="Choose which roles are allowed to use each command:"
+                            Foreground="White"
+                            FontSize="13"
+                            Margin="0,0,0,10"/>
+
+                        <TextBlock Text="if none are selected everyone can use the command."
+                            Foreground="White"
+                            FontSize="13"
+                            Margin="0,0,0,10"
+                            FontStyle="Italic"/>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Queue Command"
+                                Foreground="White"
+                                FontSize="13"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <CheckBox x:Name="QueueAllowVIP"
+                                    Content="VIPs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="QueueAllowSub"
+                                    Content="Subs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="QueueAllowMod"
+                                    Content="Mods"
+                                    Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Blacklist Command"
+                                Foreground="White"
+                                FontSize="13"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <CheckBox x:Name="BlacklistAllowVIP"
+                                    Content="VIPs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="BlacklistAllowSub"
+                                    Content="Subs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="BlacklistAllowMod"
+                                    Content="Mods"
+                                    Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Unblacklist Command"
+                                Foreground="White"
+                                FontSize="13"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <CheckBox x:Name="UnblacklistAllowVIP"
+                                    Content="VIPs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="UnblacklistAllowSub"
+                                    Content="Subs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="UnblacklistAllowMod"
+                                    Content="Mods"
+                                    Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Ban Command"
+                                Foreground="White"
+                                FontSize="13"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <CheckBox x:Name="BanAllowVIP"
+                                    Content="VIPs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="BanAllowSub"
+                                    Content="Subs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="BanAllowMod"
+                                    Content="Mods"
+                                    Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="Unban Command"
+                                Foreground="White"
+                                FontSize="13"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <CheckBox x:Name="UnbanAllowVIP"
+                                    Content="VIPs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="UnbanAllowSub"
+                                    Content="Subs"
+                                    Foreground="White"
+                                    Margin="0,0,10,0" />
+
+                                <CheckBox x:Name="UnbanAllowMod"
+                                    Content="Mods"
+                                    Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
 
                     <!-- Save Button -->
                     <Button Content="{Binding Settings_Save}"
