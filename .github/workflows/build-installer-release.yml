@@ -42,6 +42,13 @@ jobs:
             Write-Error "❌ Could not extract version from $versionFile"
             exit 1
           }
+
+      - name: ⬇️ Download .NET 6 Desktop Runtime Installer
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://download.visualstudio.microsoft.com/download/pr/d2d760b1-f231-46f3-9852-3381c79e3e6b/6f3bbedb0b2a8d83a0104e68c9a7cf13/windowsdesktop-runtime-6.0.27-win-x64.exe" `
+            -OutFile "installer/dotnet-runtime.exe"
+        shell: pwsh
       
       - name: 🛠 Compile Installer (Inno Setup)
         run: |
