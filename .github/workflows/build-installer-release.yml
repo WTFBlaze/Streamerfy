@@ -54,6 +54,13 @@ jobs:
           Invoke-WebRequest `
             -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" `
             -OutFile "installer/InstallerPayload/vc_redist.x64.exe"
+
+      - name: 📝 Replace PLACEHOLDER in Streamerfy.iss
+        run: |
+          $version = "${{ steps.get_version.outputs.version }}"
+          $issFile = "installer/Streamerfy.iss"
+          (Get-Content $issFile) -replace "AppVersion=PLACEHOLDER", "AppVersion=$version" | Set-Content $issFile
+        shell: pwsh
       
       - name: 🛠 Compile Installer (Inno Setup)
         run: |
