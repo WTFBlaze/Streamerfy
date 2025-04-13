@@ -117,62 +117,50 @@ namespace Streamerfy
         #region App Settings Methods
         private bool SetupAppSettings()
         {
-            string logPath = "setup_settings.log";
-            void Log(string message) => File.AppendAllText(logPath, $"[{DateTime.UtcNow}] {message}\n");
-
             try
             {
-                Log("SetupAppSettings: Start");
-
                 if (!File.Exists(SettingsFile))
                 {
-                    Log("Settings file not found. Creating new one.");
                     File.Create(SettingsFile).Close();
                     Settings = new AppSettings();
-                    Log("Initialized new AppSettings");
                     SaveAppSettings();
-                    Log("Saved new AppSettings");
+                    return true;
+                }
+
+                if (File.ReadAllText(SettingsFile).Length == 0)
+                {
+                    Settings = new AppSettings();
+                    SaveAppSettings();
                 }
                 else
                 {
-                    Log("Settings file exists. Reading content.");
                     var content = File.ReadAllText(SettingsFile);
-                    Log($"Content read: {content.Length} characters");
 
                     if (string.IsNullOrEmpty(content))
                     {
-                        Log("Content is null or empty. Returning false.");
                         return false;
                     }
 
-                    Log("Parsing JSON...");
                     var rawJson = JObject.Parse(content);
-                    Log("JSON parsed successfully");
 
-                    Log("Running migrations...");
                     MigrateOldCommand(rawJson, "CmdQueue");
                     MigrateOldCommand(rawJson, "CmdBlacklist");
                     MigrateOldCommand(rawJson, "CmdUnblacklist");
                     MigrateOldCommand(rawJson, "CmdBan");
                     MigrateOldCommand(rawJson, "CmdUnban");
-                    Log("Migrations complete");
 
                     var updatedJson = rawJson.ToString();
                     Settings = JsonConvert.DeserializeObject<AppSettings>(updatedJson)!;
-                    Log("Deserialized into AppSettings");
 
                     SaveAppSettings();
-                    Log("Saved updated AppSettings");
                 }
             }
             catch (Exception ex)
             {
-                Log($"Exception caught: {ex.Message}\n{ex.StackTrace}");
                 MessageBox.Show($"There was an issue Setting up Streamerfy Settings! | Err Msg: {ex.Message}");
                 return false;
             }
 
-            Log("SetupAppSettings: Success");
             return true;
         }
 
