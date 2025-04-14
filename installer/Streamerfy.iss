@@ -1,8 +1,6 @@
 [Setup]
-AppId={{4e9b134c-9cec-4e51-8135-916a2adad545}} ; A unique, constant GUID for your app
 AppName=Streamerfy
 AppVersion=PLACEHOLDER
-AllowSameVersion=yes
 DefaultDirName={autopf}\Streamerfy
 DefaultGroupName=Streamerfy
 OutputDir=Output
@@ -10,7 +8,6 @@ OutputBaseFilename=StreamerfyInstaller
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=Streamerfy.ico
-UpdateUninstallLogAppName=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -47,23 +44,4 @@ function NeedsVC(): Boolean;
 begin
   // Checks for VC++ Redistributable 2015–2022
   Result := not RegKeyExists(HKLM64, 'SOFTWARE\Microsoft\DevDiv\VC\Servicing\14.0\RuntimeMinimum');
-end;
-
-function InitializeSetup(): Boolean;
-var
-  PrevVersion: string;
-begin
-  // Check if Streamerfy is already installed
-  if RegQueryStringValue(HKLM, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Streamerfy_is1', 'DisplayVersion', PrevVersion) then
-  begin
-    if CompareStr(PrevVersion, '{#AppVersion}') = 0 then
-    begin
-      MsgBox('Streamerfy v' + PrevVersion + ' is already installed. You can repair or reinstall it.', mbInformation, MB_OK);
-    end
-    else
-    begin
-      MsgBox('An older version of Streamerfy (' + PrevVersion + ') is installed. It will be updated to v{#AppVersion}.', mbInformation, MB_OK);
-    end;
-  end;
-  Result := True;
 end;
