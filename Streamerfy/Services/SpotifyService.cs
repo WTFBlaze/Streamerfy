@@ -8,7 +8,7 @@ namespace Streamerfy.Services
 {
     public class SpotifyService
     {
-        private const string CallbackUrl = "http://localhost:5543/callback";
+        private const string CallbackUrl = "http://127.0.0.1:5543/callback";
 
         private readonly EmbedIOAuthServer _server;
         private SpotifyClient _client;
