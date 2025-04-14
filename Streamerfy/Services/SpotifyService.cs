@@ -192,6 +192,41 @@ namespace Streamerfy.Services
             return true;
         }
 
+        public async Task<bool> AddToQueue(SpotifyTrack track, string requestedBy = "Unknown")
+        {
+            if (_blacklist.IsTrackBlacklisted(track.ID)) return false;
+            if (_blacklist.IsArtistBlacklisted(track.Artist.ID ?? "")) return false;
+
+            var uri = $"spotify:track:{track.ID}";
+            await _client.Player.AddToQueue(new PlayerAddToQueueRequest(uri));
+            _requestedTracks[track.ID] = requestedBy;
+            return true;
+        }
+
+        public async Task<SpotifyTrack?> SearchTrack(string query)
+        {
+            var searchRequest = new SearchRequest(SearchRequest.Types.Track, query);
+            var searchResponse = await _client.Search.Item(searchRequest);
+            var track = searchResponse.Tracks?.Items?.FirstOrDefault();
+
+            if (track == null)
+                return null;
+
+            return new SpotifyTrack
+            {
+                AlbumArtUrl = track.Album.Images.FirstOrDefault()?.Url ?? "",
+                ID = track.Id,
+                Explicit = track.Explicit,
+                Name = track.Name,
+                Artist = new SpotifyArtist
+                {
+                    ID = track.Artists.FirstOrDefault()?.Id ?? "",
+                    Name = track.Artists.FirstOrDefault()?.Name ?? "Unknown"
+                }
+            };
+
+        }
+
         // Track URL: https://open.spotify.com/track/5TXDeTFVRVY7Cvt0Dw4vWW
         public async Task<SpotifyTrack?> GetTrackInfo(string url)
         {

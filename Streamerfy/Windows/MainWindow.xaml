@@ -10,7 +10,6 @@
         Background="Transparent"
         ShowInTaskbar="True"
         WindowState="Normal"
-        Topmost="True"
         DataContext="{x:Static services:LanguageService.ViewModel}">
 
 

@@ -1,4 +1,5 @@
-﻿using Streamerfy.Data.Json;
+﻿using Streamerfy.Data.Internal.Service;
+using Streamerfy.Data.Json;
 using Streamerfy.Windows;
 using System.Collections.Concurrent;
 using System.Windows;
@@ -149,8 +150,20 @@ namespace Streamerfy.Services
                             return;
                         }
 
-                        var url = arg1;
-                        var track = await _spotify.GetTrackInfo(url);
+                        string input = msg.Substring(rawCommand.Length).Trim(); // Get the full user input after the command
+                        SpotifyTrack? track = null;
+
+                        if (Uri.TryCreate(input, UriKind.Absolute, out var uri) && uri.Host.Contains("spotify.com"))
+                        {
+                            // Input is a Spotify URL
+                            track = await _spotify.GetTrackInfo(input);
+                        }
+                        else
+                        {
+                            // Input is a search query
+                            track = await _spotify.SearchTrack(input);
+                        }
+
                         if (track == null)
                         {
                             Reject(LanguageService.Translate("Message_Chat_Track_Not_Found"));
@@ -179,7 +192,7 @@ namespace Streamerfy.Services
                             return;
                         }
 
-                        bool success = await _spotify.AddToQueue(url);
+                        bool success = await _spotify.AddToQueue(track);
 
                         if (!success)
                         {
