@@ -1,6 +1,8 @@
 [Setup]
+AppId={{4e9b134c-9cec-4e51-8135-916a2adad545}} ; A unique, constant GUID for your app
 AppName=Streamerfy
 AppVersion=PLACEHOLDER
+AllowSameVersion=yes
 DefaultDirName={autopf}\Streamerfy
 DefaultGroupName=Streamerfy
 OutputDir=Output
@@ -8,6 +10,7 @@ OutputBaseFilename=StreamerfyInstaller
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=Streamerfy.ico
+UpdateUninstallLogAppName=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -33,12 +36,6 @@ Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; S
 ; Install .NET Desktop Runtime if missing
 Filename: "{tmp}\windowsdesktop-runtime-6.0.36-win-x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installing .NET 6 Desktop Runtime..."; Check: NeedsDotNet
 
-; Register the HttpListener URL ACL (requires admin, but installer already runs as admin)
-Filename: "netsh"; Parameters: "http add urlacl url=http://+:8080/ user=Everyone"; StatusMsg: "Registering HTTP access on port 8080..."; Flags: runhidden
-
-[UninstallRun]
-Filename: "netsh"; Parameters: "http delete urlacl url=http://+:8080/"; StatusMsg: "Removing HTTP access registration..."; Flags: runhidden
-
 [Code]
 function NeedsDotNet(): Boolean;
 begin
@@ -50,4 +47,23 @@ function NeedsVC(): Boolean;
 begin
   // Checks for VC++ Redistributable 2015–2022
   Result := not RegKeyExists(HKLM64, 'SOFTWARE\Microsoft\DevDiv\VC\Servicing\14.0\RuntimeMinimum');
+end;
+
+function InitializeSetup(): Boolean;
+var
+  PrevVersion: string;
+begin
+  // Check if Streamerfy is already installed
+  if RegQueryStringValue(HKLM, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Streamerfy_is1', 'DisplayVersion', PrevVersion) then
+  begin
+    if CompareStr(PrevVersion, '{#AppVersion}') = 0 then
+    begin
+      MsgBox('Streamerfy v' + PrevVersion + ' is already installed. You can repair or reinstall it.', mbInformation, MB_OK);
+    end
+    else
+    begin
+      MsgBox('An older version of Streamerfy (' + PrevVersion + ') is installed. It will be updated to v{#AppVersion}.', mbInformation, MB_OK);
+    end;
+  end;
+  Result := True;
 end;
