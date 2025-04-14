@@ -40,7 +40,10 @@ namespace Streamerfy.Services
             _nowPlaying = nowPlaying;
             _playbackHistory = playbackHistoryService;
 
+            # if DEBUG
             Logger.UnregisterLogger<ConsoleLogger>(); // Disables the annoying console logging spam. (Will redirect to a proper logger later)
+            #endif
+
             _server = new AuthServer(new Uri(CallbackUrl), 5543, Assembly.GetExecutingAssembly(), "Streamerfy.Assets.SpotifyAuth.default_site");
             StartAuthFlow();
         }
