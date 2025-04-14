@@ -79,7 +79,6 @@ Planned features and future improvements:
 - [ ] Command cooldowns / spam protection
 - [ ] Discord webhook integration
 - [ ] Twitch Channel Point Redeems
-- [ ] TikTok Live integration (Widget Supports TikTok Live Studio but TikTok Chat Requests are still to be added)
 
 > Got an idea? [Open an issue](https://github.com/WTFBlaze/Streamerfy/issues) or leave feedback in [Discussions](https://github.com/WTFBlaze/Streamerfy/discussions)
 
