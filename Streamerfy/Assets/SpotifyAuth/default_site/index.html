@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Spotify Authorization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+          rel="stylesheet" />
+
+    <!-- Custom Styles -->
+    <link href="/auth_assets/main.css" rel="stylesheet" />
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+    <main class="w-full max-w-xl">
+        <div class="flex justify-center mb-6 logo">
+            <img src="/auth_assets/logo.svg" width="100" height="100" />
+        </div>
+
+        <div id="error" class="hidden error text-center">
+            <h1 class="text-3xl font-bold mb-2">Error!</h1>
+            <p class="text-lg">
+                Spotify Authorization was not successful. You may want to retry.
+            </p>
+        </div>
+
+        <div id="success" class="hidden success text-center">
+            <h1 class="text-3xl font-bold mb-2">Success!</h1>
+            <p class="text-lg">
+                Spotify Authorization was successful. You can close this tab and go
+                back to your app.
+            </p>
+        </div>
+
+        <div class="text-center py-4 px-4 my-6 alert rounded shadow">
+            <div class="flex items-center justify-center space-x-4">
+                <span class="px-3 py-1 text-xs font-bold uppercase rounded tip-badge">Tip</span>
+                <span class="text-sm">
+                    If the app does not detect the authorization, use
+                    <b>Chrome</b>, <b>Edge</b>, or <b>Firefox</b>.
+                </span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom JS -->
+    <script src="/auth_assets/main.js"></script>
+</body>
+</html>

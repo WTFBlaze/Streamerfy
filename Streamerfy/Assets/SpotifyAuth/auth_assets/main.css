@@ -1,0 +1,40 @@
+/* Base Styling */
+body {
+    background-color: #1e1e1e;
+    color: #dddddd;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header Styling */
+h1 {
+    color: #44ff88;
+}
+
+/* Logo Styling */
+.logo img {
+    filter: drop-shadow(0 0 4px #00ff88);
+}
+
+/* Alert Container */
+.alert {
+    background-color: #2e2e2e;
+    color: #eeeeee;
+    border: 1px solid #444;
+    border-left: 4px solid #44ff88;
+}
+
+/* Tip Badge */
+.tip-badge {
+    background-color: #44ff88;
+    color: #000;
+}
+
+/* Success Message */
+.success {
+    color: #88ff88;
+}
+
+/* Error Message */
+.error {
+    color: #ff8888;
+}

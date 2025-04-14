@@ -17,8 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\NowPlayingServerTemplate.html" />
-    <None Remove="Assets\NowPlayingTemplate.html" />
+    <None Remove="Assets\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,12 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\NowPlayingServerTemplate.html" />
-    <EmbeddedResource Include="Assets\NowPlayingTemplate.html" />
+    <EmbeddedResource Include="Assets\**\*" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\Downloads\Streamerfy.png">
+    <None Include="Streamerfy.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

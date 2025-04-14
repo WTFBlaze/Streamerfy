@@ -34,7 +34,7 @@ namespace Streamerfy.Services
         private async Task StartAsync()
         {
             _listener.Start();
-            Console.WriteLine("[INFO] Local HTTP server started...");
+            LoggingService.AddLog("Local HTTP server started.", ConsoleColor.Cyan);
 
             while (_listener.IsListening)
             {
@@ -87,7 +87,7 @@ namespace Streamerfy.Services
         {
             _listener.Stop();
             _listener.Close();
-            Console.WriteLine("[Info] Local HTTP server stopped...");
+            LoggingService.AddLog("Local HTTP server stopped.", ConsoleColor.DarkCyan);
         }
 
         private async Task EnsureHostsFileEntry()
@@ -110,7 +110,7 @@ namespace Streamerfy.Services
             }
 
             File.AppendAllText(hostsFilePath, Environment.NewLine + entry);
-            Console.WriteLine("[INFO] Added streamerfy.local entry to hosts file.");
+            LoggingService.AddLog("Added streamerfy.local entry to hosts file.", ConsoleColor.Green);
         }
 
         private bool IsAdministrator()

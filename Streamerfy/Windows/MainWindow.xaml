@@ -12,7 +12,6 @@
         WindowState="Normal"
         DataContext="{x:Static services:LanguageService.ViewModel}">
 
-
     <Window.Resources>
         <!-- Close Button Style -->
         <Style x:Key="RoundedCloseButtonStyle" TargetType="Button">

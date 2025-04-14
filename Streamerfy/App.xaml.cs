@@ -19,11 +19,16 @@ namespace Streamerfy
     public partial class App : Application
     {
         public static AppSettings Settings { get; set; }
+
+        #region Roaming Structure
         public static string RoamingFolder { get; private set; }
         public static string SettingsFile { get; private set; }
         public static string PlaybackFile { get; private set; }
 
         public static string LanguagesFolder { get; private set; }
+
+        public static string LogsFolder { get; private set; }
+        public static string LatestLogPath { get; private set; }
 
         public static string BlacklistFolder { get; private set; }
         public static string SongBlacklistFile { get; private set; }
@@ -35,6 +40,7 @@ namespace Streamerfy
         public static string NowPlayingHTMLFile { get; private set; }
         public static string NowPlayingServerHTMLFile { get; private set; }
         public static string NowPlayingTXTFile { get; private set; }
+        #endregion
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -58,9 +64,11 @@ namespace Streamerfy
 
             if (!roamingFiles || !appSettings)
             {
-                MessageBox.Show($"Failed to initialize application settings. (RoamingFiles: {roamingFiles} | AppSettings: {appSettings}) Exiting.");
+                MessageBox.Show($"Failed to initialize application settings. (RoamingFiles Status: {roamingFiles} | AppSettings Status: {appSettings}) Exiting.");
                 return;
             }
+
+            LoggingService.Initialize();
 
             Task.Run(async () =>
             {
@@ -93,9 +101,11 @@ namespace Streamerfy
                 BlacklistFolder = EnsureDirectoryExistance(RoamingFolder, "Blacklist");
                 NowPlayingFolder = EnsureDirectoryExistance(RoamingFolder, "NowPlaying");
                 LanguagesFolder = EnsureDirectoryExistance(RoamingFolder, "Languages");
+                LogsFolder = EnsureDirectoryExistance(RoamingFolder, "Logs");
 
                 // Ensure Files
                 SettingsFile = EnsureFileExistance(RoamingFolder, "Settings.json", false);
+                LatestLogPath = EnsureFileExistance(RoamingFolder, "latest.log", false);
                 PlaybackFile = EnsureFileExistance(RoamingFolder, "PlaybackHistory.json");
                 SongBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Tracks.json");
                 ArtistBlacklistFile = EnsureFileExistance(BlacklistFolder, "Blacklist_Artists.json");

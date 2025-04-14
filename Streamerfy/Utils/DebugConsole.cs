@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Streamerfy.Services;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Streamerfy.Utils
@@ -19,7 +20,6 @@ namespace Streamerfy.Utils
             if (Debugger.IsAttached && !_isConsoleAllocated)
             {
                 _isConsoleAllocated = AllocConsole();
-                Console.WriteLine("Console initialized for debugging.");
             }
 #endif
         }
@@ -29,7 +29,6 @@ namespace Streamerfy.Utils
 #if DEBUG
             if (_isConsoleAllocated)
             {
-                Console.WriteLine("Cleaning up console...");
                 FreeConsole();
                 _isConsoleAllocated = false;
             }

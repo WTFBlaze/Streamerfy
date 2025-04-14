@@ -3,6 +3,11 @@ using SpotifyAPI.Web;
 using Streamerfy.Data.Internal.Service;
 using System.Windows.Media;
 using Streamerfy.Windows;
+using SpotifyAPI.Web.Http;
+using System.Reflection;
+using Streamerfy.Data.EmbedIO;
+using Swan;
+using Swan.Logging;
 
 namespace Streamerfy.Services
 {
@@ -10,7 +15,7 @@ namespace Streamerfy.Services
     {
         private const string CallbackUrl = "http://127.0.0.1:5543/callback";
 
-        private readonly EmbedIOAuthServer _server;
+        private readonly AuthServer _server;
         private SpotifyClient _client;
         private readonly BlacklistService _blacklist;
         private readonly NowPlayingService _nowPlaying;
@@ -35,7 +40,8 @@ namespace Streamerfy.Services
             _nowPlaying = nowPlaying;
             _playbackHistory = playbackHistoryService;
 
-            _server = new EmbedIOAuthServer(new Uri(CallbackUrl), 5543);
+            Logger.UnregisterLogger<ConsoleLogger>(); // Disables the annoying console logging spam. (Will redirect to a proper logger later)
+            _server = new AuthServer(new Uri(CallbackUrl), 5543, Assembly.GetExecutingAssembly(), "Streamerfy.Assets.SpotifyAuth.default_site");
             StartAuthFlow();
         }
 

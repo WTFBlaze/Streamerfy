@@ -11,7 +11,6 @@ namespace Streamerfy.Services
         private const string GitHubRepoBase = "https://raw.githubusercontent.com/WTFBlaze/Streamerfy/master/Languages/";
 
         private static Dictionary<string, string> _translations = new();
-        private static string _currentVersion = "0.0.0";
         private static TaskCompletionSource<bool> _readyTcs = new();
 
         public static LanguageViewModel ViewModel { get; } = new();
@@ -24,28 +23,25 @@ namespace Streamerfy.Services
             {
                 IsInitialized = false;
                 _readyTcs.TrySetResult(false);
-                Console.WriteLine("[INFO] Re-initializing LanguageService...");
+                LoggingService.AddLog("Re-initializing LanguageService...", ConsoleColor.Yellow);
             }
-            else
-            {
-                Console.WriteLine("[INFO] Initializing LanguageService...");
-            }
+            else LoggingService.AddLog("Initializing LanguageService...", ConsoleColor.Yellow);
 
             string lang = App.Settings.Language ?? "en";
             string path = Path.Combine(App.LanguagesFolder, $"{lang}.json");
 
-            Console.WriteLine($"[INFO] Selected language: {lang}");
-            Console.WriteLine($"[INFO] Checking file at: {path}");
+            LoggingService.AddLog($"Selected language: {lang}", ConsoleColor.DarkYellow);
+            LoggingService.AddLog($"Checking file at: {path}", ConsoleColor.DarkYellow);
 
             bool needsDownload = !File.Exists(path) || !await IsLanguageFileUpToDate(lang, path);
             if (needsDownload)
             {
-                Console.WriteLine("[INFO] Language file not found. Attempting to download...");
+                LoggingService.AddLog("Language file not found. Attempting to download...", ConsoleColor.Cyan);
 
                 bool success = await TryDownloadLanguageFile(lang);
                 if (!success)
                 {
-                    Console.WriteLine("[WARN] Failed to download language file. Falling back to English.");
+                    LoggingService.AddLog("Failed to download language file. Falling back to English.", ConsoleColor.Yellow);
 
                     lang = "en";
                     App.Settings.Language = "en";
@@ -53,23 +49,21 @@ namespace Streamerfy.Services
 
                     if (!await TryDownloadLanguageFile("en"))
                     {
-                        Console.WriteLine("[ERROR] Failed to download English fallback. Localization disabled.");
+                        LoggingService.AddLog("Failed to download English fallback. Localization disabled.", ConsoleColor.Red);
                         return;
                     }
                 }
                 path = Path.Combine(App.LanguagesFolder, $"{lang}.json");
             }
 
-            Console.WriteLine("[INFO] Loading language file from disk...");
+            LoggingService.AddLog("Loading language file from disk...", ConsoleColor.Yellow);
             LoadFromFile(path);
-            Console.WriteLine("[INFO] Applying translations to UI...");
+            LoggingService.AddLog("Applying translations to UI...", ConsoleColor.Cyan);
             ApplyToViewModel();
 
             _readyTcs.TrySetResult(true);
-            if (MainWindow.Instance == null)
-                Console.WriteLine("MAINWINDOW:INSTANCE IS NULL!");
             MainWindow.Instance?.FlushQueuedLogs();
-            Console.WriteLine("[SUCCESS] LanguageService initialized.");
+            LoggingService.AddLog("LanguageService Initialized.", ConsoleColor.Green);
             IsInitialized = true;
         }
 
@@ -99,7 +93,7 @@ namespace Streamerfy.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR] Failed to fetch language list: " + ex.Message);
+                LoggingService.AddLog($"Failed to fetch language list: {ex.Message}", ConsoleColor.Red);
                 return new List<string> { "en" };
             }
         }
@@ -109,7 +103,7 @@ namespace Streamerfy.Services
         {
             try
             {
-                Console.WriteLine("[INFO] Checking for language file updates...");
+                LoggingService.AddLog("Checking for language file updates...", ConsoleColor.Yellow);
 
                 var http = new HttpClient();
                 var onlineJson = await http.GetStringAsync($"{GitHubRepoBase}{lang}.json");
@@ -118,14 +112,14 @@ namespace Streamerfy.Services
                 var localJson = await File.ReadAllTextAsync(localPath);
                 var localVersion = JsonDocument.Parse(localJson).RootElement.GetProperty("version").GetString();
 
-                Console.WriteLine($"[DEBUG] Online version: {onlineVersion}");
-                Console.WriteLine($"[DEBUG] Local version:  {localVersion}");
+                LoggingService.AddLog($"Online version: {onlineVersion}", ConsoleColor.Cyan);
+                LoggingService.AddLog($"Local version: {localVersion}", ConsoleColor.DarkCyan);
 
                 return localVersion == onlineVersion;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Failed to check language version: {ex.Message}");
+                LoggingService.AddLog($"Failed to check language version: {ex.Message}", ConsoleColor.Red);
                 return false;
             }
         }
@@ -135,7 +129,7 @@ namespace Streamerfy.Services
             try
             {
                 var url = $"{GitHubRepoBase}{lang}.json";
-                Console.WriteLine($"[INFO] Downloading language file: {url}");
+                LoggingService.AddLog($"Downloading language file: {url}", ConsoleColor.Yellow);
 
                 using var http = new HttpClient();
                 var data = await http.GetStringAsync(url);
@@ -143,12 +137,12 @@ namespace Streamerfy.Services
 
                 await File.WriteAllTextAsync(path, data);
 
-                Console.WriteLine("[SUCCESS] Language file downloaded.");
+                LoggingService.AddLog("Language file downloaded.", ConsoleColor.Green);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Failed to download '{lang}' language file: {ex.Message}");
+                LoggingService.AddLog($"Failed to download '{lang}' language file: {ex.Message}", ConsoleColor.Red);
                 return false;
             }
         }
@@ -157,11 +151,11 @@ namespace Streamerfy.Services
         {
             if (!File.Exists(path))
             {
-                Console.WriteLine($"[ERROR] Language file does not exist: {path}");
+                LoggingService.AddLog($"Language file does not exist: {path}", ConsoleColor.Red);
                 return;
             }
 
-            Console.WriteLine($"[INFO] Reading file: {path}");
+            LoggingService.AddLog($"Reading file: {path}", ConsoleColor.Cyan);
 
             var json = File.ReadAllText(path);
             var doc = JsonDocument.Parse(json);
@@ -169,48 +163,66 @@ namespace Streamerfy.Services
             _translations.Clear();
             foreach (var prop in doc.RootElement.EnumerateObject())
             {
-                if (prop.Name == "version")
+                switch (prop.Name)
                 {
-                    _currentVersion = prop.Value.GetString() ?? "0.0.0";
-                    Console.WriteLine($"[INFO] Language file version: {_currentVersion}");
-                }
-                else
-                {
-                    _translations[prop.Name] = prop.Value.GetString() ?? "";
+                    case "language":
+                        {
+                            var language = prop.Value.GetString() ?? "Unknown";
+                            LoggingService.AddLog($"Language file name: {language}", ConsoleColor.Magenta);
+                        }
+                        break;
+
+                    case "version":
+                        {
+                            var currentVersion = prop.Value.GetString() ?? "0.0.0";
+                            LoggingService.AddLog($"Language file version: {currentVersion}", ConsoleColor.Magenta);
+                        }
+                        break;
+
+                    case "authors":
+                        {
+                            var authors = prop.Value.GetString() ?? "Unknown";
+                            LoggingService.AddLog($"Language file author(s): {authors}", ConsoleColor.Magenta);
+                        }
+                        break;
+
+                    default:
+                        _translations[prop.Name] = prop.Value.GetString() ?? "";
+                        break;
                 }
             }
 
-            Console.WriteLine($"[INFO] Loaded {_translations.Count} translations.");
+            LoggingService.AddLog($"Loaded {_translations.Count} translations.", ConsoleColor.Green);
         }
 
         private static void ApplyToViewModel()
         {
-            Console.WriteLine("[INFO] Applying translations to ViewModel...");
+            LoggingService.AddLog("Applying translations to ViewModel...", ConsoleColor.Yellow);
 
             foreach (var pair in _translations)
             {
                 ViewModel[pair.Key] = pair.Value;
-                Console.WriteLine($"[BIND] {pair.Key} = {pair.Value}");
             }
 
             ViewModel.ConnectButtonLabel = ViewModel.Button_Connect;
+            LoggingService.AddLog("Applied translations to ViewModel.", ConsoleColor.Green);
         }
 
         public static string Translate(string key, object? placeholders = null)
         {
-            Console.WriteLine($"[LanguageService] Translate() called with key = '{key}'");
+            //Console.WriteLine($"[LanguageService] Translate() called with key = '{key}'");
 
             if (!_translations.TryGetValue(key, out var template))
             {
-                Console.WriteLine($"[LanguageService] ❌ Key '{key}' not found in _translations.");
+                //Console.WriteLine($"[LanguageService] ❌ Key '{key}' not found in _translations.");
                 return $"[{key}]";
             }
 
-            Console.WriteLine($"[LanguageService] ✅ Found key. Template = \"{template}\"");
+            //Console.WriteLine($"[LanguageService] ✅ Found key. Template = \"{template}\"");
 
             if (placeholders == null)
             {
-                Console.WriteLine("[LanguageService] No placeholders provided. Returning template as-is.");
+                //Console.WriteLine("[LanguageService] No placeholders provided. Returning template as-is.");
                 return template;
             }
 
@@ -221,11 +233,11 @@ namespace Streamerfy.Services
             {
                 var placeholder = $"{{{prop.Name}}}";
                 var value = prop.GetValue(placeholders)?.ToString() ?? "";
-                Console.WriteLine($"[LanguageService] Replacing {placeholder} with '{value}'");
+                //Console.WriteLine($"[LanguageService] Replacing {placeholder} with '{value}'");
                 result = result.Replace(placeholder, value);
             }
 
-            Console.WriteLine($"[LanguageService] Final result: \"{result}\"");
+            //Console.WriteLine($"[LanguageService] Final result: \"{result}\"");
             return result;
         }
     }
