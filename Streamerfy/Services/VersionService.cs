@@ -6,7 +6,7 @@ namespace Streamerfy.Services
     public static class VersionService
     {
         private const string LatestReleaseApi = "https://api.github.com/repos/WTFBlaze/Streamerfy/releases/latest";
-        public const string CurrentVersion = "1.0.7";
+        public const string CurrentVersion = "1.0.8";
 
         public static async Task<(bool isUpdateAvailable, string latestVersion)> CheckForUpdatesAsync()
         {
