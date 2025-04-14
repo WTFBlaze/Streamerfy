@@ -7,6 +7,7 @@ OutputDir=Output
 OutputBaseFilename=StreamerfyInstaller
 Compression=lzma
 SolidCompression=yes
+SetupIconFile=Streamerfy.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

@@ -482,16 +482,30 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
+                    <!-- Version 1.0.7 -->
+                    <ToggleButton Content="v1.0.7"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_0_7"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_7"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Updated Spotify Callback to follow Spotify's new Callback Requirements." Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
                     <!-- Version 1.0.6 -->
                     <ToggleButton Content="v1.0.6"
                         Style="{StaticResource SectionToggleButtonStyle}"
-                        IsChecked="True"
+                        IsChecked="False"
                         Checked="ChangelogToggle_Checked"
                         Unchecked="ChangelogToggle_Unchecked"
                         Tag="Changelog_v1_0_6"/>
 
                     <StackPanel x:Name="Changelog_v1_0_6"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         Margin="10,0,0,15">
                         <TextBlock Text="• Fixed Connection Label not updating when changing languages" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                         <TextBlock Text="• Added Minimize button next to close button" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
