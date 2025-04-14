@@ -615,7 +615,7 @@
             <!-- Settings Panel -->
             <ScrollViewer x:Name="SettingsPanel"
                 Grid.Row="2"
-                Visibility="Collapsed"
+                Visibility="Visible"
                 Margin="10"
                 Background="#252526"
                 VerticalScrollBarVisibility="Auto"
@@ -623,12 +623,36 @@
                 Focusable="True">
 
                 <StackPanel Margin="10" Orientation="Vertical" VerticalAlignment="Top" >
-                    <!-- Title -->
-                    <TextBlock Text="{Binding Settings_Title}"
-                        Foreground="White"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Margin="0,0,0,20"/>
+
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Title -->
+                        <TextBlock Text="{Binding Settings_Title}"
+                            Foreground="White"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"/>
+
+                        <!-- Open Folder Button -->
+                        <Button Content="Open Settings Folder"
+                            Click="OpenSettingsFolder_Click"
+                            Background="#3a3a3a"
+                            Foreground="White"
+                            Padding="8,4"
+                            FontSize="13"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Margin="10,0,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Grid.Column="1"/>
+                    </Grid>
+
 
                     <!-- Uncategorized Items -->
                     <StackPanel Margin="0,0,0,10" Orientation="Horizontal" VerticalAlignment="Center">

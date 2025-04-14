@@ -1,6 +1,7 @@
 ﻿using Streamerfy.Data.Internal.Enums;
 using Streamerfy.Data.Internal.Json;
 using Streamerfy.Services;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -386,6 +387,11 @@ namespace Streamerfy.Windows
                 tb.Text = lower;
                 tb.CaretIndex = caretIndex;
             }
+        }
+
+        private void OpenSettingsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", App.RoamingFolder);
         }
 
         private void TwitchSectionToggle_Checked(object sender, RoutedEventArgs e)
