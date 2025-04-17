@@ -480,16 +480,30 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
+                    <!-- Version 1.0.9 -->
+                    <ToggleButton Content="v1.0.9"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_0_9"/>
+
+                    <StackPanel x:Name="Changelog_v1_0_9"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Updated Now Playing Server's Port to stop getting blocked by apps like SteamWebHelper that use port 8080. (View wiki for new port)" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
                     <!-- Version 1.0.8 -->
                     <ToggleButton Content="v1.0.8"
                         Style="{StaticResource SectionToggleButtonStyle}"
-                        IsChecked="True"
+                        IsChecked="False"
                         Checked="ChangelogToggle_Checked"
                         Unchecked="ChangelogToggle_Unchecked"
                         Tag="Changelog_v1_0_8"/>
 
                     <StackPanel x:Name="Changelog_v1_0_8"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         Margin="10,0,0,15">
                         <TextBlock Text="• Added Searching by Track Title" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                         <TextBlock Text="• Added LoggingService (proper log files system)" Foreground="White" FontSize="13" Margin="0,0,0,5"/>

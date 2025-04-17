@@ -17,19 +17,47 @@ namespace Streamerfy.Services
 
         public NowPlayingService()
         {
+            LoggingService.AddLog("NowPlayingService constructor started", ConsoleColor.Yellow);
+
             Task.Run(async () =>
             {
-                await EnsureHostsFileEntry();
+                LoggingService.AddLog("Ensuring hosts file entry...", ConsoleColor.Gray);
+                try
+                {
+                    await EnsureHostsFileEntry();
+                    LoggingService.AddLog("Hosts file check complete.", ConsoleColor.Gray);
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.AddLog("EnsureHostsFileEntry FAILED: " + ex.Message, ConsoleColor.Red);
+                }
             });
 
-            _listener = new HttpListener();
-            _listener.Prefixes.Add("http://127.0.0.1:8080/nowplaying/");
+            try
+            {
+                _listener = new HttpListener();
+                _listener.Prefixes.Add("http://127.0.0.1:8081/nowplaying/");
+                LoggingService.AddLog("HttpListener setup complete.", ConsoleColor.Gray);
+            }
+            catch (Exception ex)
+            {
+                LoggingService.AddLog("HttpListener setup FAILED: " + ex.Message, ConsoleColor.Red);
+            }
 
             Task.Run(async () =>
             {
-                await StartAsync();
+                LoggingService.AddLog("Starting HTTP listener task...", ConsoleColor.Gray);
+                try
+                {
+                    await StartAsync();
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.AddLog("StartAsync FAILED: " + ex.Message, ConsoleColor.Red);
+                }
             });
         }
+
 
         private async Task StartAsync()
         {
