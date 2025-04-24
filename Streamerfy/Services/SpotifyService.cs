@@ -27,6 +27,11 @@ namespace Streamerfy.Services
         private string _lastTrackId = "";
         private bool _lastIsPlaying = true;
         private Timer _pollTimer;
+        private Timer _tokenRefreshTimer;
+
+        private SpotifyClientConfig _config;
+        private OAuthClient _oauthClient;
+        private AuthorizationCodeTokenResponse _token;
 
         private readonly Dictionary<string, string> _requestedTracks = new();
 
@@ -40,15 +45,14 @@ namespace Streamerfy.Services
             _nowPlaying = nowPlaying;
             _playbackHistory = playbackHistoryService;
 
-            # if DEBUG
-            Logger.UnregisterLogger<ConsoleLogger>(); // Disables the annoying console logging spam. (Will redirect to a proper logger later)
-            #endif
+#if DEBUG
+            Logger.UnregisterLogger<ConsoleLogger>();
+#endif
 
             _server = new AuthServer(new Uri(CallbackUrl), 5543, Assembly.GetExecutingAssembly(), "Streamerfy.Assets.SpotifyAuth.default_site");
             StartAuthFlow();
         }
 
-        #region Initialization Methods
         private void StartAuthFlow()
         {
             Task.Run(async () =>
@@ -61,14 +65,90 @@ namespace Streamerfy.Services
                 var loginRequest = new LoginRequest(_server.BaseUri, _clientId, LoginRequest.ResponseType.Code)
                 {
                     Scope = new[] {
-                        Scopes.UserModifyPlaybackState,
-                        Scopes.UserReadPlaybackState,
-                        Scopes.UserReadCurrentlyPlaying
+                            Scopes.UserModifyPlaybackState,
+                            Scopes.UserReadPlaybackState,
+                            Scopes.UserReadCurrentlyPlaying,
                     }
                 };
 
                 BrowserUtil.Open(loginRequest.ToUri());
             });
+        }
+
+        private async Task OnAuthorizationCodeReceived(object sender, AuthorizationCodeResponse response)
+        {
+            await _server.Stop();
+
+            _config = SpotifyClientConfig.CreateDefault();
+            _oauthClient = new OAuthClient(_config);
+
+            _token = await _oauthClient.RequestToken(
+                new AuthorizationCodeTokenRequest(_clientId, _clientSecret, response.Code, new Uri(CallbackUrl))
+            );
+
+            _client = new SpotifyClient(_token.AccessToken);
+
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Success"), Colors.LimeGreen);
+
+            StartPolling();
+            StartTokenRefreshTimer();
+        }
+
+        private async Task OnErrorReceived(object sender, string error, string? state)
+        {
+            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Failure", new { ERROR = error }), Colors.OrangeRed);
+            await _server.Stop();
+        }
+
+        private async Task RefreshTokenAsync()
+        {
+            if (_token == null || string.IsNullOrEmpty(_token.RefreshToken)) return;
+
+            try
+            {
+                var refresh = await _oauthClient.RequestToken(
+                    new AuthorizationCodeRefreshRequest(_clientId, _clientSecret, _token.RefreshToken)
+                );
+
+                // Update token fields
+                _token.AccessToken = refresh.AccessToken;
+                _token.ExpiresIn = refresh.ExpiresIn;
+                _token.CreatedAt = refresh.CreatedAt;
+
+                _client = new SpotifyClient(_token.AccessToken);
+
+                MainWindow.Instance.AddLog("Spotify token refreshed successfully.", Colors.LimeGreen);
+            }
+            catch (APIUnauthorizedException)
+            {
+                MainWindow.Instance.AddLog("Spotify token refresh failed. Please reauthenticate.", Colors.OrangeRed);
+            }
+        }
+
+        private async Task<T> WithAutoRefresh<T>(Func<SpotifyClient, Task<T>> action)
+        {
+            try
+            {
+                return await action(_client);
+            }
+            catch (APIUnauthorizedException)
+            {
+                await RefreshTokenAsync();
+                return await action(_client);
+            }
+        }
+
+        private async Task WithAutoRefresh(Func<SpotifyClient, Task> action)
+        {
+            try
+            {
+                await action(_client);
+            }
+            catch (APIUnauthorizedException)
+            {
+                await RefreshTokenAsync();
+                await action(_client);
+            }
         }
 
         private void StartPolling()
@@ -77,8 +157,8 @@ namespace Streamerfy.Services
             {
                 try
                 {
-                    var playing = await _client.Player.GetCurrentlyPlaying(new());
-                    var playback = await _client.Player.GetCurrentPlayback();
+                    var playing = await WithAutoRefresh(c => c.Player.GetCurrentlyPlaying(new()));
+                    var playback = await WithAutoRefresh(c => c.Player.GetCurrentPlayback());
 
                     var track = playing?.Item as FullTrack;
                     bool isPlaying = playback?.IsPlaying ?? false;
@@ -91,14 +171,12 @@ namespace Streamerfy.Services
                         return;
                     }
 
-                    // If track changed
                     if (track.Id != _lastTrackId)
                     {
                         _lastTrackId = track.Id;
                         _lastIsPlaying = isPlaying;
                         OnSongChanged(track, isPlaying);
                     }
-                    // If playback state changed
                     else if (isPlaying != _lastIsPlaying)
                     {
                         _lastIsPlaying = isPlaying;
@@ -109,30 +187,19 @@ namespace Streamerfy.Services
                 {
                     MainWindow.Instance.AddLog(LanguageService.Translate("Message_Polling_Error", new { ERROR = ex.Message }), Colors.OrangeRed);
                 }
-            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5)); // poll every 5s
-        }
-        #endregion
-
-        #region Event Methods
-        private async Task OnErrorReceived(object sender, string error, string? state)
-        {
-            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Failure", new { ERROR = error }), Colors.OrangeRed);
-            await _server.Stop();
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
         }
 
-        private async Task OnAuthorizationCodeReceived(object sender, AuthorizationCodeResponse response)
+        private void StartTokenRefreshTimer()
         {
-            await _server.Stop();
+            if (_token == null || _token.ExpiresIn <= 0) return;
 
-            var config = SpotifyClientConfig.CreateDefault();
-            var token = await new OAuthClient(config).RequestToken(
-                new AuthorizationCodeTokenRequest(_clientId, _clientSecret, response.Code, new Uri(CallbackUrl))
-            );
-
-            _client = new SpotifyClient(token);
-
-            MainWindow.Instance.AddLog(LanguageService.Translate("Message_Spotify_Authorization_Success"), Colors.LimeGreen);
-            StartPolling();
+            // Schedule token refresh slightly before it expires
+            var refreshInterval = TimeSpan.FromSeconds(_token.ExpiresIn - 60); // Refresh 1 minute before expiration
+            _tokenRefreshTimer = new Timer(async _ =>
+            {
+                await RefreshTokenAsync();
+            }, null, refreshInterval, refreshInterval);
         }
 
         private void OnSongChanged(FullTrack track, bool isPlaying)
@@ -142,7 +209,6 @@ namespace Streamerfy.Services
             string coverUrl = track.Album.Images.FirstOrDefault()?.Url ?? "";
             string trackId = track.Id;
 
-            // Check if the track was requested by someone
             string requestedBy = _requestedTracks.TryGetValue(trackId, out var name)
                 ? name
                 : "Spotify (Autoplay/Shuffle)";
@@ -162,12 +228,9 @@ namespace Streamerfy.Services
                 }
             }, requestedBy);
 
-            // Remove from memory once used
             _requestedTracks.Remove(trackId);
-
             MainWindow.Instance.RefreshHistoryList();
         }
-
 
         private void OnPlaybackToggled(FullTrack track, bool isPlaying)
         {
@@ -181,9 +244,7 @@ namespace Streamerfy.Services
             MainWindow.Instance.AddLog(LanguageService.Translate("Message_Playback_Notice", new { STATE = statusText, SONG = trackName, ARTIST = artistName }), color);
             _nowPlaying.Update(trackName, artistName, coverUrl, isPlaying);
         }
-        #endregion
 
-        #region Misc Methods
         public async Task<bool> AddToQueue(string url, string requestedBy = "Unknown")
         {
             var track = await GetTrackInfo(url);
@@ -193,9 +254,8 @@ namespace Streamerfy.Services
             if (_blacklist.IsArtistBlacklisted(track.Artist.ID)) return false;
 
             var uri = $"spotify:track:{track.ID}";
-            await _client.Player.AddToQueue(new PlayerAddToQueueRequest(uri));
 
-            // Store who requested it
+            await WithAutoRefresh(c => c.Player.AddToQueue(new PlayerAddToQueueRequest(uri)));
             _requestedTracks[track.ID] = requestedBy;
 
             return true;
@@ -207,7 +267,7 @@ namespace Streamerfy.Services
             if (_blacklist.IsArtistBlacklisted(track.Artist.ID ?? "")) return false;
 
             var uri = $"spotify:track:{track.ID}";
-            await _client.Player.AddToQueue(new PlayerAddToQueueRequest(uri));
+            await WithAutoRefresh(c => c.Player.AddToQueue(new PlayerAddToQueueRequest(uri)));
             _requestedTracks[track.ID] = requestedBy;
             return true;
         }
@@ -215,11 +275,10 @@ namespace Streamerfy.Services
         public async Task<SpotifyTrack?> SearchTrack(string query)
         {
             var searchRequest = new SearchRequest(SearchRequest.Types.Track, query);
-            var searchResponse = await _client.Search.Item(searchRequest);
+            var searchResponse = await WithAutoRefresh(c => c.Search.Item(searchRequest));
             var track = searchResponse.Tracks?.Items?.FirstOrDefault();
 
-            if (track == null)
-                return null;
+            if (track == null) return null;
 
             return new SpotifyTrack
             {
@@ -233,10 +292,8 @@ namespace Streamerfy.Services
                     Name = track.Artists.FirstOrDefault()?.Name ?? "Unknown"
                 }
             };
-
         }
 
-        // Track URL: https://open.spotify.com/track/5TXDeTFVRVY7Cvt0Dw4vWW
         public async Task<SpotifyTrack?> GetTrackInfo(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Host != "open.spotify.com")
@@ -247,7 +304,7 @@ namespace Streamerfy.Services
                 return null;
 
             var id = segments[1];
-            var track = await _client.Tracks.Get(id);
+            var track = await WithAutoRefresh(c => c.Tracks.Get(id));
 
             return new SpotifyTrack
             {
@@ -262,7 +319,6 @@ namespace Streamerfy.Services
             };
         }
 
-        // Artist URL: https://open.spotify.com/artist/15UsOTVnJzReFVN1VCnxy4
         public async Task<SpotifyArtist?> GetArtistInfo(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Host != "open.spotify.com")
@@ -273,7 +329,7 @@ namespace Streamerfy.Services
                 return null;
 
             var id = segments[1];
-            var artist = await _client.Artists.Get(id);
+            var artist = await WithAutoRefresh(c => c.Artists.Get(id));
 
             return new SpotifyArtist
             {
@@ -281,6 +337,5 @@ namespace Streamerfy.Services
                 Name = artist.Name
             };
         }
-        #endregion
     }
 }
