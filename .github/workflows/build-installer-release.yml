@@ -61,6 +61,11 @@ jobs:
           $issFile = "installer/Streamerfy.iss"
           (Get-Content $issFile) -replace "AppVersion=PLACEHOLDER", "AppVersion=$version" | Set-Content $issFile
         shell: pwsh
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup --no-progress --yes
+        shell: pwsh
       
       - name: 🛠 Compile Installer (Inno Setup)
         run: |
