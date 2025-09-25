@@ -475,21 +475,35 @@
 
                 <StackPanel Margin="10" Orientation="Vertical">
                     <TextBlock Text="{Binding Changelog_Title}"
-                   Foreground="White"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   Margin="0,0,0,20"/>
+                       Foreground="White"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
 
-                    <!-- Version 1.0.9 -->
-                    <ToggleButton Content="v1.1.0"
+                    <!-- Version 1.1.1 -->
+                    <ToggleButton Content="v1.1.1"
                         Style="{StaticResource SectionToggleButtonStyle}"
                         IsChecked="True"
+                        Checked="ChangelogToggle_Checked"
+                        Unchecked="ChangelogToggle_Unchecked"
+                        Tag="Changelog_v1_1_1"/>
+
+                    <StackPanel x:Name="Changelog_v1_1_1"
+                        Visibility="Visible"
+                        Margin="10,0,0,15">
+                        <TextBlock Text="• Fixed port in NowPlayingServer.html" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                    </StackPanel>
+
+                    <!-- Version 1.1.0 -->
+                    <ToggleButton Content="v1.1.0"
+                        Style="{StaticResource SectionToggleButtonStyle}"
+                        IsChecked="False"
                         Checked="ChangelogToggle_Checked"
                         Unchecked="ChangelogToggle_Unchecked"
                         Tag="Changelog_v1_1_0"/>
 
                     <StackPanel x:Name="Changelog_v1_1_0"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         Margin="10,0,0,15">
                         <TextBlock Text="• Made Streamerfy auto refresh spotify auth token when it expires." Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                     </StackPanel>
@@ -505,7 +519,8 @@
                     <StackPanel x:Name="Changelog_v1_0_9"
                         Visibility="Collapsed"
                         Margin="10,0,0,15">
-                        <TextBlock Text="• Updated Now Playing Server's Port to stop getting blocked by apps like SteamWebHelper that use port 8080. (View wiki for new port)" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="• Updated Now Playing Server's Port to stop getting blocked by apps like SteamWebHelper that use port 8080." Foreground="White" FontSize="13" Margin="0,0,0,5"/>
+                        <TextBlock Text="(View wiki for new port)" Foreground="White" FontSize="13" Margin="0,0,0,5"/>
                     </StackPanel>
 
                     <!-- Version 1.0.8 -->

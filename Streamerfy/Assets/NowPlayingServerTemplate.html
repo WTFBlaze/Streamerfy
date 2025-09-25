@@ -248,7 +248,7 @@
 
         async function fetchNowPlaying() {
             try {
-                const response = await fetch("http://streamerfy.local:8080/nowplaying/api/", { cache: "no-store" });
+                const response = await fetch("http://streamerfy.local:8081/nowplaying/api/", { cache: "no-store" });
                 const data = await response.json();
                 updateNowPlaying(data);
             } catch (err) {
